@@ -35,12 +35,14 @@ O código do plugin fica na raiz deste repositório. Para publicar uma versão, 
 
 Atualize o changelog e valide o comportamento no ambiente de testes. O fluxo **Verificar plugin** confere sintaxe PHP/JavaScript, versões e a estrutura do ZIP. Essas verificações não substituem testes no WordPress com WooCommerce, tema e meios de pagamento do site.
 
-Há duas formas de publicar após salvar o código na branch correta:
+Ao enviar para `main` uma alteração em `nexo-cursos.php`, o fluxo **Publicar versao** lê a versão do cabeçalho, valida os três números, cria a tag correspondente no commit e publica o ZIP. Assim, salvar os três valores da nova versão e enviar esse commit para `main` inicia a distribuição.
+
+Também existem duas alternativas de publicação:
 
 - **Pelo GitHub:** abra **Actions → Publicar versao → Run workflow**, selecione a branch que contém a versão e informe a tag `vX.Y.Z`. O fluxo cria a tag no commit selecionado quando ela ainda não existe, monta o ZIP e publica a release.
 - **Por uma tag:** envie uma tag `vX.Y.Z` que aponte para o commit da versão. O fluxo de publicação roda automaticamente.
 
-A tag deve coincidir com os três valores da versão. Uma tag existente que aponta para outro commit é rejeitada. Releases existentes não são substituídas. Para corrigir uma versão já publicada, publique um novo número.
+A tag deve coincidir com os três valores da versão. Nos fluxos por tag ou execução manual, uma tag existente que aponta para outro commit é rejeitada. Uma execução automática da `main` que encontre uma release daquele número termina preservando a release, seu anexo e sua tag, mesmo que o código da branch tenha avançado; ela não substitui uma versão publicada. Rascunhos existentes também são preservados. Para corrigir uma versão já publicada, atualize os três valores e publique um novo número.
 
 O fluxo usa apenas o token temporário do próprio GitHub Actions, com permissão de escrita no conteúdo do repositório para a etapa de publicação. Não é necessário cadastrar uma chave pessoal. Se o repositório bloquear Actions ou suas permissões de escrita, a publicação precisa ser habilitada nas configurações do repositório.
 
@@ -66,5 +68,4 @@ A entrega inclui gestão educacional básica e vendas individuais pela conta com
 - [WooCommerce e HPOS](https://developer.woocommerce.com/docs/features/orders/high-performance-order-storage/recipe-book/)
 
 Licença [GPL-2.0-or-later](LICENSE.txt).
-
 

@@ -1,0 +1,35 @@
+name: Verificar plugin
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Obter codigo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Verificar PHP
+        shell: bash
+        run: |
+          set -euo pipefail
+          php --version
+          php -r 'if (PHP_VERSION_ID < 80100) { exit(1); }'
+          php -l nexo-cursos.php
+          php -l uninstall.php
+          find includes -type f -name '*.php' -print0 | xargs -0 -r -n 1 php -l
+      - name: Verificar JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          find assets -type f -name '*.js' -print0 | xargs -0 -r -n 1 node --check
+      - name: Validar pacote instalavel
+        run: python3 tools/build-release.py

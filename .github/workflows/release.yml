@@ -1,0 +1,86 @@
+name: Publicar versao
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths: ['nexo-cursos.php']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Versao estavel que coincide com o codigo selecionado (vX.Y.Z)'
+        required: true
+        type: string
+        default: 'v1.1.0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Obter codigo da versao selecionada
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Verificar PHP e JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          php --version
+          php -r 'if (PHP_VERSION_ID < 80100) { exit(1); }'
+          php -l nexo-cursos.php
+          php -l uninstall.php
+          find includes -type f -name '*.php' -print0 | xargs -0 -r -n 1 php -l
+          find assets -type f -name '*.js' -print0 | xargs -0 -r -n 1 node --check
+      - name: Identificar versao e construir ZIP
+        id: package
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            TAG="$INPUT_TAG"
+          elif [[ "$EVENT_NAME" == "push" && "$REF" == "refs/heads/main" ]]; then
+            TAG="$(python3 -c 'from pathlib import Path; import re; print("v" + re.search(r"^[ \t]*\*[ \t]*Version:[ \t]*([^ \r\n]+)", Path("nexo-cursos.php").read_text(encoding="utf-8"), re.MULTILINE).group(1))')"
+          elif [[ "$EVENT_NAME" == "push" && "$REF" == refs/tags/* ]]; then
+            TAG="$REF_NAME"
+          else
+            echo 'Evento de publicacao nao suportado.' >&2
+            exit 1
+          fi
+          python3 tools/build-release.py --tag "$TAG"
+          printf 'tag=%s\n' "$TAG" >> "$GITHUB_OUTPUT"
+      - name: Publicar nova versao da main
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.package.outputs.tag }}
+        run: python3 tools/publish-release.py --tag "$TAG" --allow-create-tag --skip-existing-release
+      - name: Publicar release da tag enviada
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.package.outputs.tag }}
+        run: python3 tools/publish-release.py --tag "$TAG"
+      - name: Publicar release pelo painel Actions
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.package.outputs.tag }}
+        run: python3 tools/publish-release.py --tag "$TAG" --allow-create-tag
