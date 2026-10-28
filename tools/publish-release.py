@@ -45,6 +45,9 @@ def main_cli() -> None:
     asset = Path("dist/nexo-cursos.zip")
     if not asset.is_file():
         parser.exit(1, "The validated dist/nexo-cursos.zip asset is missing.\n")
+    theme_asset = Path("dist/shalom-formacao.zip")
+    if not theme_asset.is_file():
+        parser.exit(1, "The validated companion theme asset is missing.\n")
     try:
         target = run("git", "rev-parse", "HEAD")
         if not target or not re.fullmatch(r"[0-9a-f]{40}", target):
@@ -78,7 +81,7 @@ def main_cli() -> None:
                 raise RuntimeError("Tag object nesting exceeds the supported limit.")
             if sha != target:
                 raise RuntimeError("The existing tag points to a different commit. No tag or release was changed.")
-        command = ["gh", "release", "create", args.tag, str(asset), "--generate-notes", "--title", f"Nexo Cursos {args.tag}"]
+        command = ["gh", "release", "create", args.tag, str(asset), str(theme_asset), "--generate-notes", "--title", f"Nexo Cursos {args.tag}"]
         command.extend(["--target", target] if ref is None else ["--verify-tag"])
         result = run(*command)
         print(result)

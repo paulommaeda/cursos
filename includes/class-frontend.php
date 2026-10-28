@@ -18,14 +18,15 @@ final class Frontend {
         add_filter( 'login_headerurl', static fn() => home_url( '/' ) );
         add_filter( 'login_headertext', static fn() => nexo_settings()['brand_name'] );
         add_filter( 'login_message', array( self::class, 'login_message' ) );
-        foreach ( array( 'nexo_catalog' => 'catalog', 'nexo_my_courses' => 'my_courses', 'nexo_course' => 'course', 'nexo_login' => 'login', 'nexo_manager_dashboard' => 'dashboard' ) as $tag => $method ) { add_shortcode( $tag, array( self::class, $method ) ); }
+        foreach ( array( 'nexo_available_courses' => 'available_courses', 'nexo_catalog' => 'catalog', 'nexo_my_courses' => 'my_courses', 'nexo_course' => 'course', 'nexo_login' => 'login', 'nexo_manager_dashboard' => 'dashboard' ) as $tag => $method ) { add_shortcode( $tag, array( self::class, $method ) ); }
     }
 
     public static function privacy_headers(): void {
         $post = get_post();
         $private = is_singular( 'nexo_course' );
+        if (is_user_logged_in() && current_theme_supports('nexo-navigation')) { $private = true; }
         if ( $post instanceof \WP_Post ) {
-            foreach ( array( 'nexo_my_courses', 'nexo_login', 'nexo_manager_dashboard', 'nexo_course' ) as $tag ) { $private = $private || has_shortcode( $post->post_content, $tag ); }
+            foreach ( array( 'nexo_available_courses', 'nexo_navigation', 'nexo_my_courses', 'nexo_login', 'nexo_manager_dashboard', 'nexo_course' ) as $tag ) { $private = $private || has_shortcode( $post->post_content, $tag ); }
         }
         if ( $private ) {
             if ( ! defined( 'DONOTCACHEPAGE' ) ) { define( 'DONOTCACHEPAGE', true ); }
@@ -51,9 +52,9 @@ final class Frontend {
     }
 
     public static function assets(): void {
-        $post = get_post(); $needed = is_singular( 'nexo_course' );
+        $post = get_post(); $needed = is_singular( 'nexo_course' ) || current_theme_supports('nexo-navigation');
         if ( $post instanceof \WP_Post ) {
-            foreach ( array( 'nexo_catalog', 'nexo_my_courses', 'nexo_course', 'nexo_login', 'nexo_manager_dashboard' ) as $tag ) { $needed = $needed || has_shortcode( $post->post_content, $tag ); }
+            foreach ( array( 'nexo_available_courses', 'nexo_navigation', 'nexo_catalog', 'nexo_my_courses', 'nexo_course', 'nexo_login', 'nexo_manager_dashboard' ) as $tag ) { $needed = $needed || has_shortcode( $post->post_content, $tag ); }
         }
         $needed = $needed || ( function_exists( 'is_woocommerce' ) && ( is_woocommerce() || is_cart() || is_checkout() || is_account_page() ) );
         if ( ! $needed ) { return; }
@@ -85,6 +86,7 @@ final class Frontend {
     }
 
     private static function shell_open( string $active = 'catalog' ): string {
+        if (current_theme_supports('nexo-navigation')) { return '<div class="nexo-app" style="'.esc_attr(nexo_brand_styles()).'"><div class="nexo-main">'; }
         $settings = nexo_settings();
         $logo = ! empty( $settings['logo_id'] ) ? wp_get_attachment_image( absint( $settings['logo_id'] ), 'medium', false, array( 'class' => 'nexo-brand-logo', 'alt' => $settings['brand_name'] ) ) : '';
         $out = '<div class="nexo-app" style="' . esc_attr( nexo_brand_styles() ) . '"><header class="nexo-header"><a class="nexo-brand" href="' . esc_url( nexo_page_url( 'catalog' ) ) . '">' . ( $logo ?: '<span class="nexo-brand-mark">' . self::icon( 'book' ) . '</span><span>' . esc_html( $settings['brand_name'] ) . '</span>' ) . '</a><nav aria-label="Navegação dos cursos" class="nexo-nav">';
@@ -101,6 +103,7 @@ final class Frontend {
     }
 
     private static function shell_close(): string {
+        if (current_theme_supports('nexo-navigation')) { return '</div></div>'; }
         return '</main><footer class="nexo-footer"><span>' . esc_html( nexo_settings()['brand_name'] ) . ' · Aprender abre caminhos.</span><a href="' . esc_url( nexo_page_url( 'catalog' ) ) . '">Explorar cursos ' . self::icon( 'arrow' ) . '</a></footer></div>';
     }
 
@@ -108,11 +111,21 @@ final class Frontend {
         return '<div class="nexo-empty"><span class="nexo-empty-icon">' . self::icon( 'book' ) . '</span><h2>' . esc_html( $title ) . '</h2><p>' . esc_html( $text ) . '</p>' . ( $link ? '<a class="nexo-button" href="' . esc_url( $link ) . '">' . esc_html( $label ) . ' ' . self::icon( 'arrow' ) . '</a>' : '' ) . '</div>';
     }
 
+    public static function available_courses($atts = []): string {
+        $atts = shortcode_atts(['limit'=>3],$atts,'nexo_available_courses');
+        $courses = get_posts(['post_type'=>'nexo_course','post_status'=>'publish','numberposts'=>min(12,max(1,absint($atts['limit']))),'orderby'=>'date','order'=>'DESC','has_password'=>false]);
+        $out = '<div class="nexo-app nexo-available-courses" style="'.esc_attr(nexo_brand_styles()).'">';
+        if (!$courses) { return $out.self::empty_state('Novas jornadas estão sendo preparadas','Em breve, você encontrará aqui os cursos disponíveis para sua formação.').'</div>'; }
+        $out .= '<div class="nexo-course-grid">';
+        foreach ($courses as $course) { $out .= self::course_card($course, is_user_logged_in() && Core::has_access((int)$course->ID)); }
+        return $out.'</div></div>';
+    }
+
     public static function catalog( $atts = array() ): string {
         $search = isset( $_GET['nexo_search'] ) && is_string( $_GET['nexo_search'] ) ? sanitize_text_field( wp_unslash( $_GET['nexo_search'] ) ) : '';
         $mode = isset( $_GET['nexo_mode'] ) && is_string( $_GET['nexo_mode'] ) ? sanitize_key( $_GET['nexo_mode'] ) : '';
         $page = max( 1, absint( $_GET['nexo_paged'] ?? 1 ) );
-        $args = array( 'post_type' => 'nexo_course', 'post_status' => 'publish', 'posts_per_page' => 9, 'paged' => $page, 's' => $search, 'orderby' => 'date', 'order' => 'DESC' );
+        $args = array( 'post_type' => 'nexo_course', 'post_status' => 'publish', 'posts_per_page' => 9, 'has_password' => false, 'paged' => $page, 's' => $search, 'orderby' => 'date', 'order' => 'DESC' );
         if ( in_array( $mode, array( 'online', 'erp' ), true ) ) { $args['meta_query'] = array( array( 'key' => '_nexo_mode', 'value' => $mode ) ); }
         $query = new \WP_Query( $args );
         $out = self::shell_open() . '<section class="nexo-catalog-hero"><div><span class="nexo-eyebrow">CONHECIMENTO QUE TRANSFORMA</span><h1>Seu próximo passo<br>começa aqui<span>.</span></h1><p>Encontre seu curso. Desenvolva novas habilidades.<br>Construa o caminho que você quer seguir.</p><a class="nexo-text-link" href="#nexo-catalog-list">Conheça os cursos ' . self::icon( 'arrow' ) . '</a></div><div class="nexo-hero-art" aria-hidden="true"><span class="nexo-orbit nexo-orbit-one"></span><span class="nexo-orbit nexo-orbit-two"></span><div class="nexo-hero-book">' . self::icon( 'book' ) . '</div><span class="nexo-art-label">Novos caminhos,<br><strong>novas possibilidades.</strong></span><span class="nexo-art-spark">✦</span></div></section>';
@@ -131,20 +144,26 @@ final class Frontend {
     }
 
     private static function course_card( \WP_Post $course, bool $enrolled = false ): string {
+        $cover_target = !$enrolled && Commerce::is_free((int)$course->ID) ? Commerce::entry_url((int)$course->ID) : get_permalink($course);
         $mode = get_post_meta( $course->ID, '_nexo_mode', true ) === 'erp' ? 'erp' : 'online';
         $product = function_exists( 'wc_get_product' ) ? wc_get_product( absint( get_post_meta( $course->ID, '_nexo_product_id', true ) ) ) : false;
         $duration = get_post_meta( $course->ID, '_nexo_workload', true );
         $description = $course->post_excerpt ?: wp_trim_words( wp_strip_all_tags( strip_shortcodes( $course->post_content ) ), 19 );
         $image = get_the_post_thumbnail( $course->ID, 'medium_large', array( 'loading' => 'lazy', 'class' => 'nexo-course-image', 'alt' => '' ) );
-        $art = $image ?: '<div class="nexo-course-art nexo-course-art-' . ( ( $course->ID % 4 ) + 1 ) . '" aria-hidden="true"><span class="nexo-course-art-orbit"></span>' . self::icon( $mode === 'erp' ? 'users' : 'book' ) . '<span class="nexo-course-art-caption">' . esc_html( $mode === 'erp' ? 'Conecte-se. Evolua.' : 'Conhecimento em movimento.' ) . '</span></div>';
-        $out = '<article class="nexo-course-card"><a class="nexo-course-cover" href="' . esc_url( get_permalink( $course ) ) . '" aria-label="' . esc_attr( 'Ver curso: ' . $course->post_title ) . '">' . $art . '<span class="nexo-cover-badge">' . esc_html( $mode === 'erp' ? 'Presencial / gestão' : 'On-line' ) . '</span></a><div class="nexo-card-body"><div class="nexo-card-meta"><span>' . self::icon( $mode === 'erp' ? 'users' : 'play' ) . esc_html( $mode === 'erp' ? 'Experiência presencial' : 'Aprenda no seu ritmo' ) . '</span>' . ( $duration ? '<span>' . esc_html( $duration ) . '</span>' : '' ) . '</div><h3><a href="' . esc_url( get_permalink( $course ) ) . '">' . esc_html( $course->post_title ) . '</a></h3><p>' . esc_html( $description ) . '</p>';
+        $art = $image ?: '<div class="nexo-course-art nexo-course-art-' . ( ( $course->ID % 4 ) + 1 ) . '" aria-hidden="true"><span class="nexo-course-art-orbit"></span>' . self::icon( $mode === 'erp' ? 'users' : 'book' ) . '<span class="nexo-course-art-caption">' . esc_html(current_theme_supports('nexo-navigation') ? 'Crescer para servir.' : ($mode === 'erp' ? 'Conecte-se. Evolua.' : 'Conhecimento em movimento.')) . '</span></div>';
+        $out = '<article class="nexo-course-card"><a class="nexo-course-cover" href="' . esc_url( $cover_target ) . '" aria-label="' . esc_attr( 'Ver curso: ' . $course->post_title ) . '">' . $art . '<span class="nexo-cover-badge">' . esc_html( $mode === 'erp' ? 'Presencial / gestão' : 'On-line' ) . '</span></a><div class="nexo-card-body"><div class="nexo-card-meta"><span>' . self::icon( $mode === 'erp' ? 'users' : 'play' ) . esc_html( $mode === 'erp' ? 'Experiência presencial' : 'Aprenda no seu ritmo' ) . '</span>' . ( $duration ? '<span>' . esc_html( $duration ) . '</span>' : '' ) . '</div><h3><a href="' . esc_url( $cover_target ) . '">' . esc_html( $course->post_title ) . '</a></h3><p>' . esc_html( $description ) . '</p>';
         if ( $enrolled && $mode === 'online' ) {
             $progress = Core::progress( $course->ID ); $percent = min( 100, max( 0, (int) ( $progress['percent'] ?? 0 ) ) );
             $out .= '<div class="nexo-progress-label"><span>Seu progresso</span><strong>' . $percent . '%</strong></div><progress class="nexo-progress" max="100" value="' . $percent . '">' . $percent . '%</progress>';
         }
         $out .= '<div class="nexo-card-bottom">';
-        if ( $enrolled ) { $out .= '<span class="nexo-status nexo-status-active">' . self::icon( 'check' ) . ' Matriculado</span><a class="nexo-card-cta" href="' . esc_url( get_permalink( $course ) ) . '">' . esc_html( $mode === 'erp' ? 'Ver detalhes' : 'Acessar curso' ) . ' ' . self::icon( 'arrow' ) . '</a>'; }
-        else { $out .= '<span class="nexo-price">' . ( $product ? wp_kses_post( $product->get_price_html() ) : '<small>Consulte disponibilidade</small>' ) . '</span><a class="nexo-card-cta" href="' . esc_url( get_permalink( $course ) ) . '">Ver curso ' . self::icon( 'arrow' ) . '</a>'; }
+        if ( $enrolled ) { $out .= '<span class="nexo-status nexo-status-active">' . self::icon( 'check' ) . ' Matriculado</span><a class="nexo-card-cta" href="' . esc_url( $cover_target ) . '">' . esc_html( $mode === 'erp' ? 'Ver detalhes' : 'Acessar curso' ) . ' ' . self::icon( 'arrow' ) . '</a>'; }
+        else {
+            $free = Commerce::is_free((int)$course->ID);
+            $label = $free ? 'Gratuito' : ($product && Commerce::pricing_mode((int)$course->ID)==='paid' ? wp_kses_post($product->get_price_html()) : '<small>Consulte disponibilidade</small>');
+            $target = $free ? Commerce::entry_url((int)$course->ID) : get_permalink($course);
+            $out .= '<span class="nexo-price">'.$label.'</span><a class="nexo-card-cta" href="'.esc_url($target).'">'.($free?'Inscreva-se grátis':'Conhecer curso').' '.self::icon('arrow').'</a>';
+        }
         return $out . '</div></div></article>';
     }
 
@@ -161,7 +180,7 @@ final class Frontend {
             $out .= '<section class="nexo-section"><div class="nexo-section-heading"><h2>Meus cursos</h2><span class="nexo-result-count">' . count( $courses ) . ' matrícula(s)</span></div><div class="nexo-course-grid">';
             foreach ( $courses as $course ) { if ( Core::has_access( $course->ID ) ) { $out .= self::course_card( $course, true ); } }
             $out .= '</div></section>';
-        } else { $out .= self::empty_state( 'Seu próximo curso está esperando', 'Após a confirmação do pagamento, seus cursos ficarão disponíveis aqui. Matrículas presenciais também aparecem neste espaço.', nexo_page_url( 'catalog' ), 'Explorar cursos' ); }
+        } else { $out .= self::empty_state( 'Seu próximo curso está esperando', 'Seus cursos gratuitos e pagos ficarão disponíveis aqui após a matrícula. Matrículas presenciais também aparecem neste espaço.', nexo_page_url( 'catalog' ), 'Explorar cursos' ); }
         return $out . self::shell_close();
     }
 
@@ -176,6 +195,7 @@ final class Frontend {
         $id = absint( $atts['id'] ?: ( $_GET['nexo_course'] ?? ( is_singular( 'nexo_course' ) ? get_the_ID() : 0 ) ) );
         $course = get_post( $id ); $out = self::shell_open();
         if ( ! $course || $course->post_type !== 'nexo_course' || ( $course->post_status !== 'publish' && ! Core::can_manage( $id ) ) ) { return $out . self::empty_state( 'Curso não encontrado', 'Este curso não está disponível no momento.', nexo_page_url( 'catalog' ), 'Voltar ao catálogo' ) . self::shell_close(); }
+        if (post_password_required($course) && !Core::can_manage($id)) { return $out.get_the_password_form($course).self::shell_close(); }
         $access = is_user_logged_in() && Core::has_access( $id ); $mode = get_post_meta( $id, '_nexo_mode', true ) === 'erp' ? 'erp' : 'online'; $items = self::ordered_curriculum( Core::curriculum( $id ) );
         $out .= '<a class="nexo-back" href="' . esc_url( nexo_page_url( $access ? 'account' : 'catalog' ) ) . '">← ' . esc_html( $access ? 'Meus cursos' : 'Todos os cursos' ) . '</a><section class="nexo-course-heading"><div><span class="nexo-eyebrow">' . esc_html( $mode === 'erp' ? 'CURSO PRESENCIAL / GESTÃO' : 'SEU PRÓXIMO PASSO' ) . '</span><h1>' . esc_html( $course->post_title ) . '</h1>' . ( $course->post_excerpt ? '<p>' . esc_html( $course->post_excerpt ) . '</p>' : '' ) . '</div>' . ( $access ? '<span class="nexo-status nexo-status-active">' . self::icon( 'check' ) . ' Matrícula ativa</span>' : '' ) . '</section>' . self::feedback();
         if ( ! $access || $mode === 'erp' ) {
@@ -202,7 +222,11 @@ final class Frontend {
         $out = '<aside class="nexo-panel nexo-enrollment-panel">' . get_the_post_thumbnail( $id, 'medium_large', array( 'class' => 'nexo-overview-image', 'alt' => '' ) );
         $out .= '<span class="nexo-eyebrow">' . esc_html( $access ? 'INFORMAÇÕES DA MATRÍCULA' : 'INVISTA NO SEU PRÓXIMO PASSO' ) . '</span>';
         $product = function_exists( 'wc_get_product' ) ? wc_get_product( absint( get_post_meta( $id, '_nexo_product_id', true ) ) ) : false;
-        if ( ! $access && $product && $product->get_status() === 'publish' ) { $out .= '<div class="nexo-detail-price">' . wp_kses_post( $product->get_price_html() ) . '</div><a class="nexo-button nexo-button-wide" href="' . esc_url( $product->get_permalink() ) . '">Ver produto e comprar ' . self::icon( 'arrow' ) . '</a><p class="nexo-small nexo-muted">A matrícula é liberada após a confirmação do pagamento. Use sua conta na compra para acessar o curso.</p>'; }
+        if (!$access && Commerce::is_free((int)$id)) {
+            $out .= '<div class="nexo-detail-price">Gratuito</div><p class="nexo-muted">Uma oportunidade para aprender, crescer e servir.</p>';
+            $out .= is_user_logged_in() ? Commerce::join_form((int)$id) : '<a class="nexo-button nexo-button-wide" href="'.esc_url(Commerce::entry_url((int)$id)).'">Entrar ou cadastrar para participar →</a>';
+        }
+        elseif ( ! $access && $product && $product->get_status() === 'publish' && Commerce::pricing_mode((int)$id)==='paid' ) { $out .= '<div class="nexo-detail-price">' . wp_kses_post( $product->get_price_html() ) . '</div><a class="nexo-button nexo-button-wide" href="' . esc_url( $product->get_permalink() ) . '">Ver produto e comprar ' . self::icon( 'arrow' ) . '</a><p class="nexo-small nexo-muted">A matrícula é liberada após a confirmação do pagamento. Use sua conta na compra para acessar o curso.</p>'; }
         elseif ( ! $access ) { $out .= '<h3>Inscrições e informações</h3><p class="nexo-muted">Consulte a equipe responsável para saber como participar deste curso.</p>'; }
         else { $out .= '<h3>Você já faz parte.</h3><p class="nexo-muted">Acompanhe aqui as informações do seu curso. Para alterações na matrícula, procure o gerente responsável.</p>'; }
         $out .= '<dl class="nexo-course-facts">';
@@ -315,12 +339,7 @@ final class Frontend {
     }
 
     public static function login( $atts = array() ): string {
-        $settings = nexo_settings();
-        if ( is_user_logged_in() ) { return self::shell_open() . self::empty_state( 'Você já está conectado', 'Tudo pronto para continuar seu aprendizado.', nexo_page_url( 'account' ), 'Acessar meus cursos' ) . self::shell_close(); }
-        $redirect = nexo_page_url( 'account' );
-        if ( isset( $_GET['redirect_to'] ) && is_string( $_GET['redirect_to'] ) ) { $redirect = wp_validate_redirect( esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ), $redirect ); }
-        $logo = ! empty( $settings['logo_id'] ) ? wp_get_attachment_image( absint( $settings['logo_id'] ), 'medium', false, array( 'class' => 'nexo-login-logo', 'alt' => $settings['brand_name'] ) ) : '<span class="nexo-brand-mark">' . self::icon( 'book' ) . '</span><strong>' . esc_html( $settings['brand_name'] ) . '</strong>';
-        return '<div class="nexo-app nexo-login-page" style="' . esc_attr( nexo_brand_styles() ) . '"><section class="nexo-login-story"><a class="nexo-brand" href="' . esc_url( nexo_page_url( 'catalog' ) ) . '">' . $logo . '</a><div><span class="nexo-eyebrow">SEU CONHECIMENTO, SEU FUTURO</span><h1>Um novo passo.<br>Um mundo de<br>possibilidades<span>.</span></h1><p>Seu próximo capítulo começa com uma escolha.<br>Continue aprendendo com a gente.</p></div><span class="nexo-login-story-footer">Aprender abre caminhos.</span><span class="nexo-login-orbit" aria-hidden="true"></span></section><section class="nexo-login-form-side"><div class="nexo-login-form-wrap"><span class="nexo-eyebrow">BEM-VINDO DE VOLTA</span><h2>' . esc_html( $settings['login_title'] ?: 'Acesse sua conta' ) . '</h2><p class="nexo-muted">' . esc_html( $settings['login_message'] ?: 'Entre para acessar seus cursos e acompanhar sua evolução.' ) . '</p>' . wp_login_form( array( 'echo' => false, 'redirect' => $redirect, 'form_id' => 'nexo-loginform', 'label_username' => 'E-mail ou nome de usuário', 'label_password' => 'Senha', 'label_remember' => 'Manter conectado', 'label_log_in' => 'Entrar na minha conta', 'remember' => true ) ) . '<a class="nexo-forgot-password" href="' . esc_url( wp_lostpassword_url( $redirect ) ) . '">Esqueci minha senha</a><div class="nexo-login-divider"></div><p class="nexo-small nexo-muted">Ainda não tem um curso?</p><a class="nexo-button nexo-button-outline nexo-button-wide" href="' . esc_url( nexo_page_url( 'catalog' ) ) . '">Explorar os cursos ' . self::icon( 'arrow' ) . '</a><a class="nexo-back nexo-login-back" href="' . esc_url( home_url( '/' ) ) . '">← Voltar ao site</a></div></section></div>';
+        return Commerce::auth_screen();
     }
 
     public static function login_assets(): void {

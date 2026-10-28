@@ -1,0 +1,2 @@
+<?php defined('ABSPATH') || exit; get_header(); ?>
+<main id="main-content" class="shalom-page"><div class="shalom-container"><span class="shalom-eyebrow">VAMOS ENCONTRAR SEU CAMINHO</span><h1>Essa página não foi encontrada.</h1><p>Continue sua jornada conhecendo os cursos disponíveis.</p><a class="shalom-button" href="<?php echo esc_url(shalom_url('catalog')); ?>">Explorar cursos →</a></div></main><?php get_footer(); ?>

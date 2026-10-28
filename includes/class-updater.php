@@ -13,6 +13,7 @@ final class Updater {
     private const ASSET = 'nexo-cursos.zip';
 
     public static function boot(): void {
+        add_filter( 'update_themes_github.com', array(__CLASS__, 'theme_update'), 10, 4 );
         add_filter( 'update_plugins_github.com', array( __CLASS__, 'filter_update' ), 10, 4 );
         add_filter( 'plugins_api', array( __CLASS__, 'plugin_info' ), 20, 3 );
         add_filter( 'plugin_row_meta', array( __CLASS__, 'row_meta' ), 10, 2 );
@@ -99,7 +100,13 @@ final class Updater {
         $name = isset( $data['name'] ) && is_string( $data['name'] ) ? sanitize_text_field( $data['name'] ) : $tag;
         $body = isset( $data['body'] ) && is_string( $data['body'] ) ? substr( $data['body'], 0, 200000 ) : '';
         $published = isset( $data['published_at'] ) && is_string( $data['published_at'] ) ? $data['published_at'] : '';
+        $theme_package = '';
+        $theme_expected = self::REPOSITORY.'/releases/download/'.rawurlencode($tag).'/shalom-formacao.zip';
+        foreach ($data['assets'] as $asset) {
+            if (is_array($asset) && ($asset['name']??'')==='shalom-formacao.zip' && ($asset['state']??'')==='uploaded' && is_numeric($asset['size']??null) && (float)$asset['size']>0 && ($asset['browser_download_url']??'')===$theme_expected) { $theme_package=$theme_expected; break; }
+        }
         return array(
+            'theme_package' => $theme_package,
             'version' => $matches[1] . '.' . $matches[2] . '.' . $matches[3],
             'tag' => $tag,
             'name' => $name ?: $tag,
@@ -135,6 +142,15 @@ final class Updater {
         $release = self::get_release();
         if ( is_wp_error( $release ) ) { $release = get_site_transient( self::GOOD_KEY ); }
         return is_array( $release ) && isset( $release['version'], $release['package'], $release['url'] ) ? self::update_data( $release ) : $update;
+    }
+
+    /** Companion themes use their own ZIP and the shared stable release version. */
+    public static function theme_update($update, array $theme_data, string $stylesheet, array $locales) {
+        if ($stylesheet!=='shalom-formacao' || ($theme_data['UpdateURI']??'')!==self::REPOSITORY) { return $update; }
+        $release=self::get_release();
+        if (is_wp_error($release)) { $release=get_site_transient(self::GOOD_KEY); }
+        if (!is_array($release) || empty($release['theme_package'])) { return $update; }
+        return ['theme'=>'shalom-formacao','version'=>$release['version'],'new_version'=>$release['version'],'url'=>$release['url'],'package'=>$release['theme_package'],'requires'=>'6.4','requires_php'=>'8.1'];
     }
 
     /** Plugin details modal, also used by the native update screen. */

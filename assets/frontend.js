@@ -10,3 +10,16 @@
   });
   document.querySelectorAll('.nexo-curriculum-item.is-selected').forEach(function (item) { item.setAttribute('aria-current', 'step'); });
 }());
+(function () {
+  function initializeNavigation() {
+    document.querySelectorAll('.nexo-navigation-menu').forEach(function (menu) {
+      var mobile = window.matchMedia('(max-width: 1000px)');
+      function synchronize() { menu.open = !mobile.matches; }
+      synchronize();
+      if (mobile.addEventListener) { mobile.addEventListener('change', synchronize); }
+      else { mobile.addListener(synchronize); }
+    });
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeNavigation); }
+  else { initializeNavigation(); }
+}());

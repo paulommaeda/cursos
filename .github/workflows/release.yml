@@ -11,7 +11,7 @@ on:
         description: 'Versao estavel que coincide com o codigo selecionado (vX.Y.Z)'
         required: true
         type: string
-        default: 'v1.1.0'
+        default: 'v1.2.0'
 
 permissions:
   contents: read
@@ -39,7 +39,7 @@ jobs:
           php -r 'if (PHP_VERSION_ID < 80100) { exit(1); }'
           php -l nexo-cursos.php
           php -l uninstall.php
-          find includes -type f -name '*.php' -print0 | xargs -0 -r -n 1 php -l
+          find includes themes -type f -name '*.php' -print0 | xargs -0 -r -n 1 php -l
           find assets -type f -name '*.js' -print0 | xargs -0 -r -n 1 node --check
       - name: Identificar versao e construir ZIP
         id: package

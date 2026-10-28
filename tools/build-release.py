@@ -50,6 +50,8 @@ def build(root: Path, output: Path, tag: str | None) -> tuple[str, int]:
     if root / "includes" / "class-updater.php" not in paths:
         raise ValueError("GitHub updater module missing.")
 
+    if not (root / "includes" / "class-commerce.php").is_file():
+        raise ValueError("Course commerce module missing")
     output.parent.mkdir(parents=True, exist_ok=True)
     with ZipFile(output, "w", ZIP_DEFLATED, compresslevel=9) as archive:
         for path in sorted(paths):
@@ -70,6 +72,41 @@ def build(root: Path, output: Path, tag: str | None) -> tuple[str, int]:
     return version, len(paths)
 
 
+def build_theme(root: Path, output: Path, tag: str | None) -> tuple[str, int]:
+    root = root.resolve()
+    theme = root / "themes" / "shalom-formacao"
+    if not theme.exists():
+        theme = root.parent / "shalom-formacao"
+    theme = theme.resolve(strict=True)
+    style = (theme / "style.css").read_text(encoding="utf-8")
+    version = one_match(r"^Version:[ \t]*([^\r\n]+)$", style, "theme Version header")
+    if not re.fullmatch(VERSION_PATTERN, version):
+        raise ValueError("Invalid theme version")
+    if tag and tag != "v" + version:
+        raise ValueError("Theme version must match release tag")
+    required = ["style.css", "functions.php", "index.php", "header.php", "footer.php", "front-page.php", "page.php", "single.php", "404.php", "LICENSE.txt", "readme.txt"]
+    paths = [theme / name for name in required]
+    if (theme / "screenshot.png").is_file():
+        paths.append(theme / "screenshot.png")
+    for path in paths:
+        if not path.is_file() or path.is_symlink() or not path.resolve().is_relative_to(theme):
+            raise ValueError("Invalid theme file: " + path.name)
+        if path.suffix == ".php" and not path.read_bytes().startswith(b"<?php"):
+            raise ValueError("Theme PHP contains leading output or BOM")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with ZipFile(output, "w", ZIP_DEFLATED, compresslevel=9) as archive:
+        for path in sorted(paths):
+            entry = ZipInfo("shalom-formacao/" + path.name, date_time=(1980,1,1,0,0,0))
+            entry.create_system = 3
+            entry.external_attr = 0o100644 << 16
+            entry.compress_type = ZIP_DEFLATED
+            archive.writestr(entry, path.read_bytes(), compresslevel=9)
+    with ZipFile(output) as archive:
+        if archive.testzip() is not None or "shalom-formacao/style.css" not in archive.namelist():
+            raise ValueError("Invalid installable theme ZIP")
+    return version, len(paths)
+
+
 def main_cli() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
@@ -78,8 +115,12 @@ def main_cli() -> None:
     args = parser.parse_args()
     try:
         version, count = build(args.root, args.output, args.tag)
+        theme_version, theme_count = build_theme(args.root, args.output.with_name("shalom-formacao.zip"), args.tag)
+        if theme_version != version:
+            raise ValueError("Plugin and theme must share the release version")
     except (OSError, ValueError) as error:
         parser.exit(1, f"Package validation failed: {error}\n")
+    print(f"Shalom Formação {theme_version}: {theme_count} files")
     print(f"Nexo Cursos {version}: {count} files; {args.output.stat().st_size} bytes; {args.output}")
 
 

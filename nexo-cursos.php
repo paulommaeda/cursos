@@ -4,7 +4,7 @@
  * Description: Gestão de cursos EAD ou presenciais, matrículas, avaliações, gerentes e vendas com WooCommerce.
  * Plugin URI: https://github.com/paulommaeda/cursos
  * Update URI: https://github.com/paulommaeda/cursos
- * Version: 1.1.0
+ * Version: 1.2.0
  * Requires at least: 6.4
  * Requires PHP: 8.1
  * Author: Nexo Cursos
@@ -14,7 +14,7 @@
  * WC requires at least: 8.2
  */
 defined( 'ABSPATH' ) || exit;
-define( 'NEXO_VERSION', '1.1.0' );
+define( 'NEXO_VERSION', '1.2.0' );
 define( 'NEXO_FILE', __FILE__ );
 define( 'NEXO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NEXO_URL', plugin_dir_url( __FILE__ ) );
@@ -26,7 +26,7 @@ function nexo_settings(): array {
     foreach ( array( 'brand_name', 'login_title', 'login_message' ) as $key ) { $options[ $key ] = sanitize_text_field( $options[ $key ] ); }
     foreach ( array( 'primary_color', 'accent_color' ) as $key ) { $options[ $key ] = sanitize_hex_color( $options[ $key ] ) ?: $defaults[ $key ]; }
     $options['logo_id'] = absint( $options['logo_id'] );
-    return $options;
+    return apply_filters( 'nexo_settings', $options );
 }
 /** CSS declarations for an escaped style attribute or stylesheet rule. */
 function nexo_brand_styles(): string {
@@ -42,6 +42,7 @@ function nexo_page_url( string $key ): string {
     return home_url( '/' );
 }
 require_once NEXO_DIR . 'includes/class-core.php';
+require_once NEXO_DIR . 'includes/class-commerce.php';
 require_once NEXO_DIR . 'includes/class-admin.php';
 require_once NEXO_DIR . 'includes/class-frontend.php';
 require_once NEXO_DIR . 'includes/class-bootstrap.php';
@@ -55,6 +56,7 @@ add_action( 'before_woocommerce_init', static function () {
 } );
 add_action( 'plugins_loaded', static function () {
     \NexoCursos\Core::boot();
+    \NexoCursos\Commerce::boot();
     \NexoCursos\Admin::boot();
     \NexoCursos\Frontend::boot();
     \NexoCursos\Bootstrap::boot();
