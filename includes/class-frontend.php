@@ -314,33 +314,7 @@ final class Frontend {
         return $out . '<button class="nexo-button" type="submit">Enviar respostas ' . self::icon( 'arrow' ) . '</button></form>';
     }
 
-    public static function dashboard( $atts = array() ): string {
-        $out = self::shell_open( 'dashboard' );
-        if ( ! is_user_logged_in() ) { return $out . self::empty_state( 'Painel dos gerentes', 'Entre com sua conta de gerente para acompanhar os cursos atribuídos a você.', add_query_arg( 'redirect_to', nexo_page_url( 'dashboard' ), nexo_page_url( 'login' ) ), 'Acessar painel' ) . self::shell_close(); }
-        $ids = Core::course_ids_for_manager();
-        if ( ! current_user_can( 'manage_options' ) && ! $ids ) { return $out . self::empty_state( 'Nenhum curso atribuído', 'O administrador pode atribuir a você a gestão de um curso nas configurações do curso.' ) . self::shell_close(); }
-        $courses = $ids ? get_posts( array( 'post_type' => 'nexo_course', 'post_status' => array( 'publish', 'draft', 'pending', 'private' ), 'post__in' => $ids, 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ) ) : array();
-        $students = array(); $total_enrollments = 0; $course_totals = array();
-        foreach ( $courses as $course ) {
-            if ( ! Core::can_manage( $course->ID ) ) { continue; }
-            $course_users = array();
-            foreach ( Core::enrollments( $course->ID ) as $row ) { if ( $row->status === 'active' ) { $course_users[ (int) $row->user_id ] = true; $students[ (int) $row->user_id ] = true; } }
-            $course_totals[ $course->ID ] = count( $course_users ); $total_enrollments += count( $course_users );
-        }
-        $out .= '<section class="nexo-page-heading nexo-dashboard-heading"><div><span class="nexo-eyebrow">VISÃO GERAL DOS SEUS CURSOS</span><h1>Gestão que faz<br>o aprendizado acontecer<span>.</span></h1><p>Acompanhe suas turmas e mantenha tudo em movimento.</p></div><a class="nexo-button" href="' . esc_url( admin_url( 'admin.php?page=nexo-cursos' ) ) . '">Gerenciar matrículas ' . self::icon( 'arrow' ) . '</a></section><div class="nexo-stat-grid"><div class="nexo-stat"><span>' . self::icon( 'book' ) . ' Cursos sob sua gestão</span><strong>' . count( $courses ) . '</strong><small>Todos os formatos</small></div><div class="nexo-stat"><span>' . self::icon( 'users' ) . ' Alunos ativos</span><strong>' . count( $students ) . '</strong><small>Pessoas com matrícula ativa</small></div><div class="nexo-stat nexo-stat-highlight"><span>' . self::icon( 'check' ) . ' Matrículas ativas</span><strong>' . $total_enrollments . '</strong><small>Uma pessoa pode ter vários cursos</small></div></div><section class="nexo-panel"><div class="nexo-section-heading"><h2>Seus cursos</h2><a class="nexo-text-link" href="' . esc_url( admin_url( 'admin.php?page=nexo-cursos' ) ) . '">Abrir gestão ' . self::icon( 'arrow' ) . '</a></div>';
-        if ( $courses ) {
-            $out .= '<div class="nexo-table-wrap"><table class="nexo-table"><thead><tr><th scope="col">Curso</th><th scope="col">Formato</th><th scope="col">Alunos ativos</th><th scope="col">Situação</th><th scope="col"><span class="nexo-sr-only">Ações</span></th></tr></thead><tbody>';
-            foreach ( $courses as $course ) {
-                if ( ! Core::can_manage( $course->ID ) ) { continue; }
-                $status_object = get_post_status_object( $course->post_status );
-                $out .= '<tr><td><strong>' . esc_html( $course->post_title ) . '</strong></td><td>' . esc_html( get_post_meta( $course->ID, '_nexo_mode', true ) === 'erp' ? 'Presencial / gestão' : 'On-line' ) . '</td><td>' . (int) ( $course_totals[ $course->ID ] ?? 0 ) . '</td><td><span class="nexo-status ' . ( $course->post_status === 'publish' ? 'nexo-status-active' : '' ) . '">' . esc_html( $status_object ? $status_object->label : $course->post_status ) . '</span></td><td><a class="nexo-text-link" href="' . esc_url( add_query_arg( 'course_id', $course->ID, admin_url( 'admin.php?page=nexo-cursos' ) ) ) . '">Gerenciar ' . self::icon( 'arrow' ) . '</a></td></tr>';
-            }
-            $out .= '</tbody></table></div>';
-        } else { $out .= '<p class="nexo-muted">Os cursos criados e atribuídos a você aparecerão aqui.</p>'; }
-        $out.='</section>';
-        foreach($courses as $course){if(get_post_meta($course->ID,'_nexo_mode',true)!=='erp'||!Core::can_manage((int)$course->ID)){continue;}ob_start();Classroom::engagement(Calendar::summary((int)$course->ID));$chart=ob_get_clean();$out.='<section class="nexo-panel nexo-space-top"><h2>'.esc_html($course->post_title).'</h2>'.$chart.'<a class="nexo-button" href="'.esc_url(add_query_arg('course_id',$course->ID,admin_url('admin.php?page=nexo-cursos')).'#nexo-classroom').'">Abrir calendário e chamada</a></section>';}
-        return $out.self::shell_close();
-    }
+    public static function dashboard( $atts = array() ): string { return Portal::render(); }
 
     public static function login( $atts = array() ): string {
         return Commerce::auth_screen();

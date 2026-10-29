@@ -6,10 +6,10 @@ final class Brand {
     public static function colors(): array {
         return ['primary_color'=>['Azul principal','#071450'],'accent_color'=>['Azul luminoso / destaque','#00AEEF'],'surface_color'=>['Superfícies e cartões','#FFFFFF'],'paper_color'=>['Fundo geral','#F4F8FE'],'soft_color'=>['Fundo de seções','#EAF2FC'],'text_color'=>['Texto principal','#06102D'],'muted_color'=>['Texto secundário','#5B6D86'],'warm_color'=>['Luz / destaque quente','#F8BD69'],'footer_color'=>['Fundo do rodapé','#031C46'],'footer_text_color'=>['Texto do rodapé','#D8E8FC'],'absent_color'=>['Faltas no painel','#C95568'],'excused_color'=>['Justificativas no painel','#C29436']];
     }
-    public static function defaults(): array {$d=[];foreach(self::colors() as $key=>$c){$d[$key]=$c[1];}return $d+['body_font'=>'modern','heading_font'=>'modern','corner_radius'=>10,'login_eyebrow'=>'UMA JORNADA COM PROPÓSITO','login_headline'=>"Discipular.\nAperfeiçoar.\nEnviar.",'login_story'=>"Cresça no conhecimento da Palavra.\nPrepare-se para servir e abençoar vidas.",'login_footer'=>'Fé que aprende. Amor que serve.'];}
+    public static function defaults(): array {$d=[];foreach(self::colors() as $key=>$c){$d[$key]=$c[1];}return $d+['body_font'=>'modern','heading_font'=>'modern','corner_radius'=>10,'base_font_size'=>17,'login_eyebrow'=>'UMA JORNADA COM PROPÓSITO','login_headline'=>"Discipular.\nAperfeiçoar.\nEnviar.",'login_story'=>"Cresça no conhecimento da Palavra.\nPrepare-se para servir e abençoar vidas.",'login_footer'=>'Fé que aprende. Amor que serve.'];}
     public static function fonts(): array {return ['modern'=>'"Segoe UI",Arial,sans-serif','geometric'=>'"Trebuchet MS",Arial,sans-serif','classic'=>'Georgia,"Times New Roman",serif'];}
     public static function variables(array $s): string {
-        $vars=['surface_color'=>'surface','paper_color'=>'paper','soft_color'=>'soft','text_color'=>'text','muted_color'=>'muted','warm_color'=>'warm','footer_color'=>'footer','footer_text_color'=>'footer-text','absent_color'=>'absent','excused_color'=>'excused'];$css='';
+        $vars=['surface_color'=>'surface','paper_color'=>'paper','soft_color'=>'soft','text_color'=>'text','muted_color'=>'muted','warm_color'=>'warm','footer_color'=>'footer','footer_text_color'=>'footer-text','absent_color'=>'absent','excused_color'=>'excused'];$css='--nexo-font-size:'.max(16,min(20,absint($s['base_font_size']??17))).'px;';
         foreach($vars as $key=>$var){$css.='--nexo-'.$var.':'.(sanitize_hex_color($s[$key]??'')?:self::colors()[$key][1]).';';}
         $fonts=self::fonts();$css.='--nexo-font-body:'.($fonts[$s['body_font']??'modern']??$fonts['modern']).';--nexo-font-heading:'.($fonts[$s['heading_font']??'modern']??$fonts['modern']).';--nexo-radius:'.max(0,min(30,absint($s['corner_radius']??10))).'px;';return $css;
     }
@@ -23,7 +23,8 @@ final class Brand {
     public static function sanitize(array $input,array $old): array {
         foreach(['login_eyebrow','login_headline','login_story','login_footer'] as $key){if(isset($input[$key])&&is_string($input[$key])){$old[$key]=mb_substr(sanitize_textarea_field(wp_unslash($input[$key])),0,600);}}
         foreach(self::colors() as $key=>$data){if(isset($input[$key])&&is_string($input[$key])){$old[$key]=sanitize_hex_color(wp_unslash($input[$key]))?:($old[$key]??$data[1]);}}
-        foreach(['body_font','heading_font'] as $key){if(isset($input[$key])&&array_key_exists($input[$key],self::fonts())){$old[$key]=$input[$key];}}
+        foreach(['body_font','heading_font'] as $key){if(isset($input[$key])&&is_string($input[$key])&&array_key_exists($input[$key],self::fonts())){$old[$key]=$input[$key];}}
+        if(isset($input['base_font_size'])){$old['base_font_size']=max(16,min(20,absint($input['base_font_size'])));}
         if(isset($input['corner_radius'])){$old['corner_radius']=max(0,min(30,absint($input['corner_radius'])));}return $old;
     }
     public static function course_fields(\WP_Post $post): void {

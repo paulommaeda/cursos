@@ -4,7 +4,7 @@
  * Description: Gestão de cursos EAD ou presenciais, matrículas, avaliações, gerentes e vendas com WooCommerce.
  * Plugin URI: https://github.com/paulommaeda/cursos
  * Update URI: https://github.com/paulommaeda/cursos
- * Version: 1.3.0
+ * Version: 1.4.0
  * Requires at least: 6.4
  * Requires PHP: 8.1
  * Author: Nexo Cursos
@@ -14,7 +14,7 @@
  * WC requires at least: 8.2
  */
 defined( 'ABSPATH' ) || exit;
-define( 'NEXO_VERSION', '1.3.0' );
+define( 'NEXO_VERSION', '1.4.0' );
 define( 'NEXO_FILE', __FILE__ );
 define( 'NEXO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NEXO_URL', plugin_dir_url( __FILE__ ) );
@@ -41,13 +41,19 @@ function nexo_page_url( string $key ): string {
     $id = isset( $pages[ $key ] ) ? absint( $pages[ $key ] ) : 0;
     if ( $id && 'publish' === get_post_status( $id ) ) { return (string) get_permalink( $id ); }
     if ( 'login' === $key ) { return wp_login_url(); }
-    if ( 'dashboard' === $key ) { return admin_url( 'admin.php?page=nexo-cursos' ); }
+    if ( 'dashboard' === $key ) { return home_url('/painel-dos-cursos/'); }
     return home_url( '/' );
 }
 require_once NEXO_DIR . 'includes/class-core.php';
 require_once NEXO_DIR . 'includes/class-commerce.php';
 require_once NEXO_DIR . 'includes/class-calendar.php';
 require_once NEXO_DIR . 'includes/class-classroom.php';
+require_once NEXO_DIR . 'includes/class-portal.php';
+require_once NEXO_DIR . 'includes/class-portal-courses.php';
+require_once NEXO_DIR . 'includes/class-portal-people.php';
+require_once NEXO_DIR . 'includes/class-portal-orders.php';
+require_once NEXO_DIR . 'includes/class-portal-sales.php';
+require_once NEXO_DIR . 'includes/class-portal-brand.php';
 require_once NEXO_DIR . 'includes/class-admin.php';
 require_once NEXO_DIR . 'includes/class-frontend.php';
 require_once NEXO_DIR . 'includes/class-bootstrap.php';
@@ -61,6 +67,8 @@ add_action( 'before_woocommerce_init', static function () {
 } );
 add_action( 'plugins_loaded', static function () {
     \NexoCursos\Core::boot();
+    \NexoCursos\Portal::boot();
+    \NexoCursos\PortalOrders::boot();
     \NexoCursos\Commerce::boot();
     \NexoCursos\Calendar::boot();
     \NexoCursos\Classroom::boot();

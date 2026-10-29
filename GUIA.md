@@ -1,91 +1,104 @@
-# Shalom Formação — instalação e uso
+# Área de gestão Shalom — versão 1.4.0
 
-A versão 1.3.0 reúne o plugin Nexo Cursos e o tema Shalom Formação. A home apresenta os cursos livres da Igreja Shalom e o propósito de **discipular, aperfeiçoar e enviar**, inspirado em Efésios 4:12.
+## Instalação e acesso
 
-## Instalar os dois pacotes
+O administrador instala **nexo-cursos.zip** em Plugins e **shalom-formacao.zip** em Aparência → Temas. Para vender, ativa o WooCommerce e configura pagamentos, moeda e e-mails. Nas instalações existentes, os dois pacotes podem ser atualizados pelo painel do WordPress. A instalação inicial 1.0.0 precisa receber o ZIP atual manualmente uma vez para ganhar o atualizador.
 
-1. Ative o WooCommerce se houver cursos pagos. Configure moeda, meios de pagamento e visibilidade pública da loja no WooCommerce.
-2. Em **Plugins → Adicionar plugin → Enviar plugin**, envie **nexo-cursos.zip** e ative. Se já usa o plugin, substitua pela nova versão ou atualize pelo painel.
-3. Em **Aparência → Temas → Adicionar tema → Enviar tema**, envie **shalom-formacao.zip** e ative.
-4. A página **Formação Shalom** será criada e definida como início. O conteúdo da sua home anterior não é apagado. Ao trocar de tema, a configuração anterior é restaurada se a home ainda for a página criada pelo tema.
+Depois disso, a operação acontece no próprio site: entre pela página **Entrar** e abra **Área de gestão**. Contas da equipe vão diretamente para a gestão após o login. Alunos continuam na área de aprendizagem. O plugin prepara a página **Painel dos cursos** automaticamente; seu endereço padrão é `/painel-dos-cursos/`, respeitando a página já existente.
 
-Os ZIPs são separados: envie o plugin na área de plugins e o tema na área de temas. Os arquivos automáticos “Source code” do GitHub não são esses pacotes instaláveis.
+O wp-admin fica disponível somente a contas com permissão de administrador (`manage_options`). Gerentes, coordenação, equipe da loja e alunos são redirecionados para suas áreas no site quando tentam abrir o painel WordPress. As rotas internas de formulários e AJAX continuam funcionando, sem apresentar o painel.
 
-Requisitos: WordPress 6.4+, PHP 8.1+ e WooCommerce 8.2+ para vendas. Cursos gratuitos e matrículas manuais funcionam sem WooCommerce.
+## Perfis da equipe
 
-## Cadastrar um curso
+O administrador usa **Área de gestão → Equipe e acessos** para criar pessoas, localizar uma conta existente pelo e-mail ou alterar o perfil:
 
-Abra **Nexo Cursos → Cursos → Adicionar curso**. Preencha o título, apresentação pública, resumo e imagem. Escolha a inscrição:
+- **Gerente de cursos:** edita os cursos atribuídos, conteúdos, testes, matrículas, aulas e chamadas. Acompanha produtos e os itens dos pedidos ligados aos seus cursos. Pode criar um pedido pendente e concluir um pedido já pago, quando todos os itens pertencem à sua gestão.
+- **Coordenação:** administra todos os cursos, a apresentação do site e as vendas dos cursos. Pode confirmar pagamentos recebidos manualmente, vincular a conta do aluno e registrar reembolsos dos pedidos inteiramente sob sua gestão. Não recebe acesso ao wp-admin.
+- **Gerente da loja:** quando o WooCommerce está ativo, mantém a gestão dos produtos e pedidos da loja no site. Não recebe, por esse perfil, edição de conteúdo pedagógico de todos os cursos.
+- **Administrador:** tem a gestão completa no site e conserva o wp-admin para instalação de extensões, atualizações e configurações técnicas do WordPress/WooCommerce.
 
-- **Gratuito:** o curso aparece com o botão **Inscreva-se grátis**. O aluno vai ao cadastro/login e recebe a matrícula após autenticação, sem carrinho ou pedido.
-- **Pago:** informe um preço maior que zero. Ao salvar, um produto virtual de venda individual é criado automaticamente no WooCommerce. Título, descrição, resumo e imagem vêm do curso. Atualizações do curso sincronizam o produto gerado.
-- **Somente matrícula manual:** a equipe matricula usuários já cadastrados pelo painel de gestão. O curso não é liberado gratuitamente por falta de produto ou preço.
+Atribua os gerentes em **Cursos → Editar curso → Gerentes responsáveis**. Contas de administrador são preservadas pela edição da equipe no site. A área de alunos não oferece alteração de senha, e-mail ou permissões de terceiros.
 
-Publicar o curso disponibiliza o produto automático quando o preço é válido. Cursos em rascunho, protegidos por senha ou sem preço válido mantêm o produto automático em rascunho. Ao mudar um curso automático para gratuito ou enviá-lo à lixeira, sua antiga venda é desativada. Pedidos e matrículas existentes são preservados.
+## Cursos, conteúdos e testes
 
-O campo de produto vinculado continua disponível para casos avançados e vínculos antigos. Produtos vinculados manualmente não têm título, preço ou descrição sobrescritos pelo sincronizador. Configure desconto, impostos, estoque e meios de pagamento conforme as opções do WooCommerce. O campo de vagas do curso é uma referência; use estoque para limitar vendas.
+Em **Cursos**, crie ou edite título, apresentação, resumo, capa, cor e frase da capa, modalidade, situação, local, carga horária, vagas de referência e inscrição.
 
-## Cadastro, login e área do aluno
+- **Gratuita:** o visitante segue ao cadastro/login e confirma a matrícula, sem carrinho ou pedido.
+- **Paga:** informe o preço e, opcionalmente, um preço promocional menor. O produto virtual é criado e sincronizado automaticamente com título, descrição, resumo e capa do curso.
+- **Somente matrícula manual:** a equipe matricula contas já cadastradas. A ausência de preço não torna um curso pago gratuito.
 
-A navegação é fornecida pelo plugin: início, cursos, propósito, meus cursos, conta, carrinho e entrada. O painel do gerente aparece apenas para administradores e gerentes. O menu se adapta ao celular.
+Vínculos anteriores com produtos manuais são preservados. O estoque controla a disponibilidade para venda; o campo de vagas do curso é uma referência de planejamento.
 
-No cadastro, o aluno informa nome, e-mail e senha. A conta recebe apenas o papel de assinante/aluno. Não é necessário abrir o cadastro geral do WordPress nem alterar o papel padrão de novos usuários. Uma conta existente deve usar o login; ela não é recriada nem associada a compras apenas por compartilhar um e-mail.
+Em **Conteúdos e testes**, selecione o curso para criar tópicos, aulas e testes. Todos são opcionais. Organize por ordem numérica, associe um tópico quando desejar e adicione o vídeo de uma aula ou seu texto. Nos testes, informe as perguntas, duas a seis alternativas por pergunta, a resposta correta e a nota mínima. O conteúdo principal do curso é público; aulas, tópicos e testes ficam protegidos para quem tem acesso. As tentativas dos testes preservam a melhor nota.
 
-O fluxo gratuito transporta o curso escolhido até o cadastro/login. Se o aluno já estiver conectado, confirma a matrícula gratuita com um botão. Nos cursos pagos, o acesso é liberado quando o pedido da conta compradora estiver Processando ou Concluído. Pagamentos pendentes não liberam conteúdo.
+**Voltar para rascunho** oculta o curso do catálogo, desativa a venda do produto automático e suspende o acesso dos alunos até republicar. Não apaga matrículas, conteúdos ou histórico. Conteúdos também podem ser movidos para rascunho.
 
-Cancelamentos e reembolsos revogam a origem correspondente da matrícula; outra compra válida ou uma matrícula manual preserva o acesso. Reembolsos de item dependem da quantidade integral devolvida. A compra em quantidade não distribui vagas automaticamente para outras contas.
+## Alunos e matrículas
 
-## Tópicos, aulas, testes e gestão presencial
+Em **Alunos e matrículas**, filtre pelo curso ou busque entre os alunos sob sua gestão. Abra o acompanhamento para consultar progresso e presenças.
 
-Todos os componentes são opcionais. Crie tópicos, aulas e testes no menu Nexo Cursos e associe cada um ao curso correspondente. Aulas e testes podem ficar sem tópico. Use a ordem numérica para organizar o conteúdo. O texto principal do curso é a apresentação pública; o texto das aulas e dos tópicos fica protegido para alunos matriculados.
+Use **Matricular uma conta existente** para informar o e-mail do aluno. Ou use **Cadastrar e matricular novo aluno**: a conta é criada somente como aluno, com a opção de enviar um link para ele definir a senha. Configure a entrega de e-mails do site para que os convites cheguem.
 
-Nos testes, adicione perguntas, pelo menos duas alternativas por pergunta, uma resposta correta e nota mínima. Publique quando as perguntas estiverem prontas; um teste vazio não pode ser concluído. O aluno pode repetir e a melhor nota é preservada.
+A data da matrícula pode ser informada, até a data de hoje, para a primeira matrícula manual. Isso permite registrar a data real de entrada de uma turma já iniciada. Uma matrícula manual existente não tem sua data alterada por uma repetição da operação.
 
-O formato **Gestão / presencial** mantém matrículas, início, local, carga horária e presenças. A área de aprendizagem fica desativada, mesmo que o curso tenha aulas cadastradas. Um curso pode ter matrícula gratuita ou paga independentemente de ser EAD ou presencial.
+Remover a matrícula manual preserva o acesso concedido por outras compras válidas. Compras, cancelamentos e reembolsos são conciliados por origem. Uma compra de quantidade maior não distribui vagas automaticamente a contas diferentes.
 
-Crie usuários com papel **Gerente de cursos** e atribua-os nos cursos. Gerentes acompanham apenas os cursos atribuídos, com matrículas, progresso e chamada por aula nos cursos presenciais. A edição de cursos, conteúdos e identidade visual permanece com o administrador.
+A coordenação pode corrigir o nome de um aluno no acompanhamento. Contas da equipe e de administradores ficam protegidas dessa edição de dados de alunos.
 
-## Personalizar
+## Programação presencial e chamada
 
-- **Aparência → Personalizar:** logo, textos, imagens, botões, destinos, navegação, rodapé, paleta, fontes e organização das seções da home.
-- **Nexo Cursos → Identidade visual:** nome, logo, cores e textos de login. O tema compartilha essa identidade e fornece a marca Shalom como padrão, preservando configurações personalizadas.
-- O bloco da home mostra os cursos publicados mais recentes; o padrão de três cursos pode ser alterado para até doze no Personalizador. O catálogo completo permanece na página Cursos. Sem cursos publicados, aparece uma mensagem de preparação, sem dados fictícios.
+Em **Cursos → Editar curso**, selecione **Gestão / presencial**. Preencha início, fim inclusive, horário, duração e frequência. Habilite a geração das aulas ao salvar.
 
-## Páginas e atalhos
+Há encontro único, diário, dias úteis, semanal, quinzenal, mensal e intervalo personalizado em dias, semanas ou meses. É possível selecionar mais de um dia da semana. Sem seleção, usa o dia da data inicial. A frequência mensal ajusta para o último dia dos meses curtos e volta ao dia original quando possível. O limite é de 500 encontros por programação.
 
-O plugin cria catálogo, meus cursos, login e painel dos gerentes. Com WooCommerce, prepara loja, carrinho, checkout e conta, reaproveitando páginas existentes. Se ativar o WooCommerce depois, abra o painel para concluir a preparação. Em Identidade visual, use Verificar e criar páginas ausentes se necessário.
+Exemplo: 16/02/2027 a 20/04/2027, semanal, terça-feira, 20h gera dez aulas. O exemplo não é importado na instalação.
 
-Shortcodes disponíveis: `[nexo_catalog]`, `[nexo_available_courses limit="3"]`, `[nexo_navigation]`, `[nexo_my_courses]`, `[nexo_login]`, `[nexo_manager_dashboard]` e `[nexo_course id="123"]`.
+Em **Aulas e chamadas**, selecione o curso e a aula. A chamada abre diretamente nos alunos. No celular, o calendário e os gráficos podem ser expandidos quando necessários. Registre **presente, ausente, justificada ou pendente** e salve. A chamada fica disponível a partir da data da aula.
 
-## Atualizações e alcance
+Aulas extras, cancelamentos de encontros sem chamada, conclusão e reabertura são feitos nessa mesma área. Alterar a programação não duplica datas nem apaga aulas passadas, realizadas ou com presença. Encontros futuros retirados são cancelados; cancelamentos manuais não são desfeitos automaticamente. Para uma reposição, cancele um encontro sem registros e adicione uma aula extra.
 
-Plugin e tema usam as Releases estáveis de [paulommaeda/cursos](https://github.com/paulommaeda/cursos/releases). O servidor precisa acessar o GitHub por HTTPS; não é necessário token. O plugin oferece os controles nativos de atualização do plugin e do tema. As atualizações automáticas são uma escolha do administrador.
+O gráfico usa até os 12 últimos encontros considerados:
 
-A entrega inclui gestão educacional, cursos livres, matrículas, testes, presença e integração de vendas. Não inclui gateway próprio, contabilidade, emissão fiscal, certificados, comissões ou licenças para múltiplos alunos por compra. Vídeos externos dependem do provedor e não têm DRM. Arquivos enviados à biblioteca de mídia do WordPress podem ter URL pública; conteúdo confidencial não deve ser distribuído como mídia pública.
+- **Frequência registrada:** presentes ÷ (presentes + ausentes). Justificadas e pendentes ficam fora dessa porcentagem.
+- **Cobertura:** registros preenchidos ÷ registros esperados dos alunos elegíveis.
+- **Pendências:** campos de chamada ainda sem registro. Eles não viram faltas automaticamente.
 
-Desativar ou excluir o plugin preserva os dados educacionais por padrão. A limpeza definitiva é uma opção explícita documentada no readme. Páginas e registros financeiros do WooCommerce são mantidos.
+Aulas futuras, canceladas e alunos matriculados depois do encontro ficam fora da base correspondente. As contagens consideram alunos com matrícula ativa.
 
-Antes de abrir inscrições, teste cadastro/login, matrícula gratuita, compra em modo de testes, acesso, permissões e reembolso na combinação de tema, gateway e extensões do seu site. Nenhuma instalação de produção foi alterada nesta entrega.
+Chamadas antigas por data continuam preservadas. A opção **Importar chamadas antigas por data** copia registros somente quando existe uma única aula naquela data, sem sobrescrever chamadas já preenchidas. Nos cursos EAD, registros por data podem ser consultados e preenchidos no acompanhamento do aluno.
 
+## Produtos, vendas e pedidos
 
-## Aulas presenciais e chamadas (1.3.0)
+**Produtos:** altere preços, promoção, código do produto, disponibilidade, estoque e imagem. Produtos gerados pelo curso mantêm título, descrição, preços e capa compartilhados com ele. Produtos com variações permitem selecionar a variação para editar valores e estoque.
 
-No cadastro do curso, selecione **Gestão / presencial**. Em **Programação presencial e recorrência**, defina início, fim (inclusive), horário, duração e frequência. Marque **Gerar e atualizar aulas ao salvar**. As opções são encontro único, diário, dias úteis, semanal, quinzenal, mensal e intervalo personalizado em dias, semanas ou meses. Sem seleção de dia da semana, usa o dia da data inicial. A frequência mensal ajusta datas como 31 de janeiro para o último dia de fevereiro e volta ao dia 31 em março. Limite de 500 encontros por programação, com erro explícito antes de gravar se excedido.
+**Vendas:** filtre por período, curso e situação. Consulte pedidos pagos, pagamentos pendentes e vendas líquidas dos reembolsos. Os totais são separados por moeda e usam a data de criação dos pedidos. Baixe o relatório CSV dos itens visíveis para sua conta.
 
-Exemplo: 16/02/2027 a 20/04/2027, semanal, terça-feira, 20h gera dez aulas. Este exemplo não é importado automaticamente.
+**Pedidos:** consulte os detalhes e abra o link de pagamento de um pedido pendente. A criação manual exige uma conta de aluno existente, usa o preço atual do produto e aceita um cupom existente. O pedido nasce pendente; criar o pedido não libera o curso.
 
-Em **Nexo Cursos → Visão geral**, selecione o curso presencial. O calendário permite abrir cada chamada, adicionar aulas extras, cancelar encontros sem chamada e marcar uma aula como realizada. A chamada libera na data do encontro e usa quatro situações: presente, ausente, justificada e pendente. Salve a chamada após preencher. O aluno vê seu próprio calendário e suas presenças na área do curso.
+A equipe financeira pode confirmar o recebimento manualmente, alterar a situação, vincular uma conta e reembolsar o saldo restante. Alterar manualmente a situação para paga não realiza cobrança no cartão. Pedidos processando/concluídos liberam a matrícula da conta compradora; pagamentos pendentes não liberam acesso.
 
-O gráfico mostra até os 12 últimos encontros considerados, com tabela acessível e fórmula. Frequência = presentes ÷ (presentes + ausentes). Justificadas e pendentes não entram nessa divisão. Cobertura = chamadas preenchidas (presente, ausente ou justificada) ÷ registros esperados de alunos elegíveis. Campos em branco não viram faltas. Uma aula realizada sem chamada aparece com pendências e frequência indefinida. Aulas futuras, canceladas e alunos matriculados depois do encontro ficam fora da base correspondente.
+Pedidos com itens fora dos cursos de um gerente mostram somente seus itens e valores. Esse gerente não pode alterar a situação, as notas, a conta ou o reembolso do pedido inteiro. A coordenação dos cursos também não altera um pedido que contenha produtos alheios à gestão de cursos; o administrador ou o gerente da loja pode tratar o pedido completo.
 
-Ao alterar início, fim ou frequência, salvar novamente concilia a programação sem duplicar as datas. Preserva aulas passadas, realizadas ou com chamada. Encontros futuros retirados são cancelados e podem voltar se a data retornar à programação; cancelamentos manuais continuam cancelados. Aulas extras não são alteradas. Para uma reposição, cancele o encontro sem registros e adicione a aula extra. O histórico não é apagado por uma mudança de datas.
+Observações da equipe são internas. No reembolso, escolha **devolver pelo meio de pagamento** ou **registrar um valor já devolvido por outro meio**. O registro manual não transfere dinheiro. A devolução pelo serviço de pagamento depende do suporte do serviço usado na compra. Reembolsos exigem motivo e confirmação; o saldo restante e as quantidades são conciliados com o WooCommerce.
 
-Chamadas antigas por data continuam preservadas. Em **Programação e aulas extras → Importar chamadas antigas por data**, registros só são copiados quando existe uma única aula naquela data e ainda não existe chamada por encontro para o aluno. Não sobrescreve registros. Se houver mais de um encontro no mesmo dia, faça a conferência manual. As presenças também participam das ferramentas de exportação e exclusão de dados pessoais do WordPress.
+O histórico anterior de pedidos é organizado em segundo plano. Se necessário, use **Continuar organização do histórico** na área de pedidos. Essa organização não altera pagamentos ou pedidos.
 
-## Personalização completa da apresentação (1.3.0)
+## Identidade visual e página inicial
 
-**Nexo Cursos → Identidade visual:** nome, logo, 12 cores, fontes de títulos e textos, cantos dos cartões e apresentação do login. As três famílias disponíveis usam fontes locais, sem serviços externos.
+Em **Identidade visual**, altere nome, logo, paleta de 12 cores, fontes de títulos e textos, tamanho base de 16 a 20 px, arredondamento e textos da tela de acesso. O padrão de leitura é 17 px, com campos de 16 px e controles confortáveis para toque. As fontes são locais, sem serviços externos.
 
-**Aparência → Personalizar:** logo, nome, todos os textos da home, imagens, rótulos do menu, botões e seus destinos, rodapé, quantidade de cursos, ordem e visibilidade das seções. Em ordem das seções use `hero,strip,purpose,courses,scripture,journey`, reordene ou remova os nomes. A imagem principal opcional substitui a ilustração de montanhas e caminho. Para ajustes adicionais, o CSS adicional nativo do WordPress continua disponível.
+Em **Página inicial**, personalize textos, botões e destinos, imagem principal, rodapé, rótulos do menu, quantidade de cursos, ordem e visibilidade das seções. A imagem principal pode substituir a ilustração de montanhas e caminho. As alterações também são reconhecidas pelo Personalizador nativo, disponível ao administrador.
 
-**Cada curso:** a imagem destacada é a capa; a cor e a frase da capa são opcionais e herdam a marca quando vazias. A identidade usa azul profundo, ciano, branco e luz dourada como ponto de partida. Pode ser substituída para outra organização. A migração aplica novos padrões uma única vez e preserva valores que já foram personalizados.
+Na ordem das seções use `hero,strip,purpose,courses,scripture,journey`: reordene ou remova os nomes para ocultar seções. Cada curso aceita capa, frase e cor próprias. A identidade Shalom usa azul profundo, ciano, branco e luz dourada como ponto de partida e pode ser substituída para outra organização. Valores personalizados não são reaplicados automaticamente pela migração.
+
+## Atualizações, dados e alcance
+
+Plugin e tema usam Releases estáveis de https://github.com/paulommaeda/cursos. O servidor precisa acessar o GitHub por HTTPS; não é necessário token. Atualizações automáticas são uma opção do administrador do WordPress.
+
+Requisitos: WordPress 6.4+, PHP 8.1+ e WooCommerce 8.2+ para vendas. A gestão de cursos gratuitos e matrículas manuais funciona sem WooCommerce.
+
+Desativar ou excluir o plugin preserva dados educacionais por padrão. A constante `NEXO_DELETE_DATA=true` é uma opção explícita de limpeza na exclusão, documentada no readme. Páginas, produtos e registros financeiros do WooCommerce são mantidos. As presenças participam das ferramentas de exportação e exclusão de dados pessoais.
+
+A entrega não instala gateway próprio, contabilidade, emissão fiscal, certificados ou comissões. Configurações técnicas de extensões, pagamentos e WordPress continuam com o administrador. Vídeos externos dependem do provedor e não têm DRM; arquivos de mídia podem ter URLs públicas.
+
+As imagens e prévias usam dados demonstrativos da instalação de testes. Eles não são importados ao instalar os pacotes e nenhum site de produção foi alterado nesta entrega.

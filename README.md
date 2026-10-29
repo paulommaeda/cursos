@@ -1,91 +1,58 @@
-# Nexo Cursos e Shalom Formação — 1.3.0
+# Nexo Cursos e Shalom Formação — 1.4.0
 
-Plugin WordPress e tema Shalom Formação para cursos livres da Igreja Shalom: discipular, aperfeiçoar e enviar, conforme Efésios 4:12. O plugin administra cursos EAD, presenciais ou apenas seus cadastros e matrículas. As vendas usam o WooCommerce. Tópicos, aulas e testes são opcionais em cada curso.
+Plugin WordPress e tema para cursos livres da Igreja Shalom: discipular, aperfeiçoar e enviar, conforme Efésios 4:12. Gestão EAD ou presencial, com tópicos, aulas e testes opcionais e vendas pelo WooCommerce.
 
-Inclui dashboard dos gerentes por curso, matrículas manuais e por compra, acompanhamento de progresso, testes de múltipla escolha, presenças, catálogo e área do aluno. Nome, cores, logo e login podem receber a identidade da sua organização.
+A operação acontece na **Área de gestão do próprio site**, com navegação independente do wp-admin: cursos, conteúdos e testes, alunos, matrículas, aulas, chamada, produtos, vendas, pedidos, identidade visual, home e equipe. O painel WordPress fica reservado ao administrador.
 
-## Instalar
+## Instalar e usar
 
-Requisitos: WordPress 6.4+, PHP 8.1+ e WooCommerce 8.2+ para vendas. A gestão com matrícula manual funciona sem WooCommerce.
+1. Baixe **nexo-cursos.zip** e **shalom-formacao.zip** em [Releases](https://github.com/paulommaeda/cursos/releases/latest).
+2. O administrador instala o plugin na área de plugins e o tema na área de temas. Para vendas, configura o WooCommerce, os meios de pagamento, a moeda e os e-mails.
+3. Entre pela página **Entrar** do site e abra **Área de gestão**. A equipe segue direto para a gestão após o login.
+4. Em **Equipe e acessos**, o administrador cria ou localiza pessoas. Gerentes recebem os cursos atribuídos; a coordenação acompanha todos os cursos e as vendas dos cursos. O perfil Gerente da loja mantém a gestão dos pedidos e produtos da loja.
 
-1. Abra [Releases](https://github.com/paulommaeda/cursos/releases/latest) e baixe o anexo **nexo-cursos.zip**.
-2. No WordPress, entre em **Plugins → Adicionar plugin → Enviar plugin** e envie esse ZIP.
-3. Ative o plugin. Baixe também **shalom-formacao.zip** da mesma Release, instale em **Aparência → Temas → Adicionar tema → Enviar tema** e ative.
-4. A home da Igreja Shalom é criada automaticamente. Em **Nexo Cursos**, publique cursos gratuitos ou pagos. Nos pagos, informe o preço e o produto é criado automaticamente com título e descrição do curso.
-5. Configure o WooCommerce, sua moeda, a visibilidade pública da loja e o meio de pagamento para receber inscrições pagas.
+Requisitos: WordPress 6.4+, PHP 8.1+ e WooCommerce 8.2+ para vendas. Cursos gratuitos e gestão manual funcionam sem WooCommerce. Leia o [guia completo](GUIA.md).
 
-Use o anexo `nexo-cursos.zip` da release. Os arquivos automáticos “Source code” do GitHub contêm o repositório e não são o pacote de distribuição preparado pelo projeto.
+## Cursos e aulas presenciais
 
-O [guia de instalação e uso](GUIA.md) explica cursos, componentes, gerentes, páginas, identidade visual e matrículas. Faça a primeira instalação e uma compra de teste em uma cópia do seu site.
+Cursos gratuitos levam ao cadastro/login e à matrícula direta. Cursos pagos criam um produto virtual, sincronizando título, descrição, resumo, capa e preços. Vínculos manuais anteriores são preservados. Progresso, testes e dados de aprendizagem continuam protegidos.
 
-## Aulas presenciais e engajamento
+Defina início, fim, horário, duração e frequência para gerar aulas presenciais: encontro único, diário, dias úteis, semanal, quinzenal, mensal ou intervalo personalizado. A geração não duplica datas nem apaga histórico. Registre a chamada por encontro e acompanhe frequência, cobertura e pendências por aluno e por aula. Campos em branco não são faltas automáticas.
 
-No curso, defina data inicial, data final, horário, duração e frequência. Há encontros únicos, diário, dias úteis, semanal, quinzenal, mensal e intervalos personalizados. No formato gestão/presencial, habilite a geração das aulas ao salvar. Os gerentes abrem cada aula, registram presente, ausente, justificada ou pendente e acompanham a frequência da turma e de cada aluno. O gráfico considera encontros realizados; aulas futuras e canceladas ficam fora.
+## Operação comercial no site
 
-Frequência registrada = presentes / (presentes + ausentes). Justificadas e pendentes ficam fora da porcentagem. A cobertura mostra quanto da chamada já foi preenchido. Não há falta automática por registro em branco. Matrículas posteriores ao encontro ficam fora da base daquela aula. Mudanças da programação mantêm aulas passadas, realizadas e com chamada; aulas futuras retiradas são canceladas sem apagar o histórico.
+A equipe autorizada consulta produtos, preços e estoque; cria pedidos pendentes; acompanha pagamentos; adiciona observações; vincula a conta compradora; consulta relatórios e registra reembolsos. As operações usam o WooCommerce, com suporte ao armazenamento HPOS.
 
-## Identidade visual editável
+As permissões são conferidas no servidor. Um gerente vê apenas itens e valores ligados aos seus cursos. Pedidos que misturam itens fora de sua gestão exigem alguém com acesso ao pedido completo para alterar situação, conta ou reembolso. O registro manual de reembolso não transfere dinheiro; a devolução pelo meio de pagamento depende do serviço usado na compra.
 
-Em **Nexo Cursos → Identidade visual**, altere nome, logo, paleta, fontes, arredondamento e os textos do acesso. Em **Aparência → Personalizar → Identidade e home Shalom**, edite a apresentação inteira: textos, botões, destinos, imagem principal, rodapé, rótulos de navegação, visibilidade e ordem das seções. A paleta é compartilhada com o plugin. Cada curso aceita cor, frase da capa e imagem destacada próprias. A arte padrão é uma ilustração original de caminho e luz, com azul profundo, ciano, branco e dourado.
+## Leitura e personalização
 
-A atualização troca os antigos valores padrão da Shalom apenas uma vez; valores personalizados são preservados e escolhas feitas depois não são sobrescritas. Não instala imagens de referência, alunos ou cursos de demonstração no site.
+A interface parte de uma coluna no celular e amplia a organização em telas maiores. Textos com base de 17 px, campos de 16 px, controles de toque e tabelas que se tornam fichas identificadas nas telas pequenas.
 
-## Gratuitos e pagos
+Nome, logos, cores, fontes, tamanho do texto, capas, imagens, botões, textos da home, rótulos da navegação, ordem e visibilidade das seções são editáveis. A identidade Shalom é um ponto de partida e pode ser adaptada para outras organizações. Os exemplos das prévias não são importados para o site.
 
-Cursos gratuitos vão diretamente ao cadastro/login, com matrícula após autenticação. Cursos pagos geram um produto virtual de venda individual, sincronizando título, apresentação, resumo e imagem. Vínculos manuais antigos são preservados. Tópicos, aulas e testes continuam opcionais.
+## Atualizações pelo WordPress
 
-A navegação, os cursos disponíveis na home e a área do aluno são fornecidos pelo plugin. O tema tem marca, cores e logo configuráveis, textos da home no Personalizador e layout para celular. Os exemplos exibidos nas prévias não são importados para o site.
+O plugin consulta Releases estáveis deste repositório e informa versões novas em Plugins e Painel → Atualizações. Também reconhece o ZIP do tema separadamente. Não exige token. O servidor precisa acessar o GitHub por HTTPS.
 
-## Atualizar pelo painel do WordPress
+Instalações 1.0.0 precisam receber o ZIP atual manualmente uma vez, pois não possuíam atualizador. As atualizações automáticas são uma escolha do administrador. Rascunhos e pré-lançamentos não são distribuídos.
 
-A partir da versão **1.1.0**, o plugin consulta as releases estáveis deste repositório público e anuncia novas versões em **Plugins** e **Painel → Atualizações**. Não é necessário informar token do GitHub. O site precisa conseguir acessar o GitHub pela internet.
+## Publicar uma versão
 
-Quem instalou o ZIP **1.0.0** precisa enviar manualmente o ZIP **1.1.0** uma vez, confirmando a substituição da versão anterior. Essa primeira versão não continha o mecanismo de atualização. As próximas versões poderão ser instaladas pelo painel.
+Mantenha o mesmo número X.Y.Z no cabeçalho Version e na constante NEXO_VERSION de `nexo-cursos.php`, no Stable tag de `readme.txt` e no Version de `themes/shalom-formacao/style.css`. Atualize guia, readme, changelog e o valor sugerido no workflow de publicação.
 
-A atualização automática é uma escolha do administrador em **Plugins → Ativar atualizações automáticas**. O plugin não força essa opção nem instala atualizações por conta própria. Uma release precisa estar publicada, ser estável e conter o anexo `nexo-cursos.zip`; alterações apenas na branch `main`, rascunhos e pré-lançamentos não são distribuídos ao WordPress.
+O fluxo **Verificar plugin** valida PHP, JavaScript e os pacotes. Um envio para main que altere `nexo-cursos.php` aciona **Publicar versao**: cria a tag correspondente no commit e publica os dois ZIPs. Também é possível usar Actions → Run workflow ou enviar uma tag estável vX.Y.Z.
 
-## Preparar uma nova versão
+O publicador preserva tags e Releases já existentes. Para corrigir uma versão publicada, use um novo número. A publicação usa o token temporário do GitHub Actions e não requer chave pessoal.
 
-O código do plugin fica na raiz deste repositório. Para publicar uma versão, atualize estes valores para o mesmo número `X.Y.Z`:
-
-- Cabeçalho `Version` em `nexo-cursos.php`.
-- Constante `NEXO_VERSION` no mesmo arquivo.
-- Campo `Stable tag` em `readme.txt`.
-- Cabeçalho `Version` em `themes/shalom-formacao/style.css`.
-
-Atualize o changelog e valide o comportamento no ambiente de testes. O fluxo **Verificar plugin** confere sintaxe PHP/JavaScript, versões e a estrutura do ZIP. Essas verificações não substituem testes no WordPress com WooCommerce, tema e meios de pagamento do site.
-
-Ao enviar para `main` uma alteração em `nexo-cursos.php`, o fluxo **Publicar versao** lê a versão do cabeçalho, valida os números, cria a tag correspondente no commit e publica o ZIP. Assim, salvar os valores da nova versão e enviar esse commit para `main` inicia a distribuição.
-
-Também existem duas alternativas de publicação:
-
-- **Pelo GitHub:** abra **Actions → Publicar versao → Run workflow**, selecione a branch que contém a versão e informe a tag `vX.Y.Z`. O fluxo cria a tag no commit selecionado quando ela ainda não existe, monta o ZIP e publica a release.
-- **Por uma tag:** envie uma tag `vX.Y.Z` que aponte para o commit da versão. O fluxo de publicação roda automaticamente.
-
-A tag deve coincidir com os valores da versão. Nos fluxos por tag ou execução manual, uma tag existente que aponta para outro commit é rejeitada. Uma execução automática da `main` que encontre uma release daquele número termina preservando a release, seu anexo e sua tag, mesmo que o código da branch tenha avançado; ela não substitui uma versão publicada. Rascunhos existentes também são preservados. Para corrigir uma versão já publicada, atualize os valores e publique um novo número.
-
-O fluxo usa apenas o token temporário do próprio GitHub Actions, com permissão de escrita no conteúdo do repositório para a etapa de publicação. Não é necessário cadastrar uma chave pessoal. Se o repositório bloquear Actions ou suas permissões de escrita, a publicação precisa ser habilitada nas configurações do repositório.
-
-O pacote é criado por `tools/build-release.py` com uma lista permitida de arquivos de produção. A pasta interna permanece `nexo-cursos/`, preservando o identificador do plugin em instalações e atualizações. Ferramentas, workflows, credenciais e arquivos locais de teste ficam fora do ZIP.
-
-Para montar o mesmo pacote localmente, execute a partir da raiz do repositório:
+O plugin fica na raiz do repositório e o tema em `themes/shalom-formacao`. A montagem inclui somente arquivos de produção, mantendo as pastas `nexo-cursos/` e `shalom-formacao/` dentro dos ZIPs. Testes locais, credenciais e dados demonstrativos ficam fora dos pacotes.
 
 ```sh
-python3 tools/build-release.py --tag v1.3.0
+python3 tools/build-release.py --tag v1.4.0
 ```
 
-São criados `dist/nexo-cursos.zip` e `dist/shalom-formacao.zip`. O tema fica em `themes/shalom-formacao` no repositório e tem a mesma versão da Release. O atualizador do plugin reconhece o pacote do tema separadamente.
+## Dados e alcance
 
-## Alcance
+Desativar ou excluir o plugin preserva os registros educacionais por padrão. A limpeza definitiva exige a opção explícita NEXO_DELETE_DATA; consulte o readme. Páginas, produtos e registros financeiros do WooCommerce são preservados.
 
-A entrega inclui gestão educacional básica e vendas individuais pela conta compradora. Não inclui contabilidade, emissão fiscal, certificados, turmas avançadas, comissões ou gateway de pagamento próprio. Vídeos externos dependem do provedor e não têm DRM. Desativar ou excluir o plugin preserva registros educacionais por padrão; consulte `readme.txt` antes de optar pela limpeza definitiva.
-
-## Referências
-
-- [Integração de atualizações externas do WordPress](https://developer.wordpress.org/reference/hooks/update_plugins_hostname/)
-- [GitHub Releases](https://docs.github.com/en/rest/releases/releases)
-- [Comando de publicação do GitHub CLI](https://cli.github.com/manual/gh_release_create)
-- [WooCommerce e HPOS](https://developer.woocommerce.com/docs/features/orders/high-performance-order-storage/recipe-book/)
-
-Licença [GPL-2.0-or-later](LICENSE.txt).
-
+Configurações técnicas de extensões, pagamentos e WordPress permanecem sob responsabilidade do administrador. A entrega não inclui gateway próprio, emissão fiscal, contabilidade, certificados, comissões ou distribuição de vagas a várias contas por compra.

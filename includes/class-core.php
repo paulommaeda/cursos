@@ -66,13 +66,13 @@ final class Core {
     public static function can_manage( int $course_id, int $user_id = 0 ): bool {
         $user_id = $user_id ?: get_current_user_id();
         if ( ! $user_id || ! self::valid_course( $course_id ) ) { return false; }
-        if ( user_can( $user_id, 'manage_options' ) ) { return true; }
+        if ( user_can( $user_id, 'manage_options' ) || user_can( $user_id, 'nexo_manage_all_courses' ) ) { return true; }
         $managers = array_map( 'absint', (array) get_post_meta( $course_id, '_nexo_manager_ids', true ) );
         return user_can( $user_id, 'nexo_manage_assigned' ) && in_array( $user_id, $managers, true );
     }
     public static function course_ids_for_manager( int $user_id = 0 ): array {
         $user_id = $user_id ?: get_current_user_id();
-        if ( ! $user_id || ( ! user_can( $user_id, 'manage_options' ) && ! user_can( $user_id, 'nexo_manage_assigned' ) ) ) { return array(); }
+        if ( ! $user_id || ( ! user_can( $user_id, 'manage_options' ) && ! user_can( $user_id, 'nexo_manage_assigned' ) && ! user_can( $user_id, 'nexo_manage_all_courses' ) ) ) { return array(); }
         $ids = get_posts( array( 'post_type' => 'nexo_course', 'post_status' => array( 'publish', 'draft', 'pending', 'private', 'future' ), 'numberposts' => -1, 'fields' => 'ids', 'orderby' => 'title', 'order' => 'ASC' ) );
         return array_values( array_filter( array_map( 'absint', $ids ), static fn( $id ) => self::can_manage( $id, $user_id ) ) );
     }

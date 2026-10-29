@@ -3,7 +3,7 @@ Contributors: nexo-cursos
 Tags: courses, lms, woocommerce, education, erp
 Requires at least: 6.4
 Requires PHP: 8.1
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,8 +24,8 @@ WooCommerce é necessário para vendas. Gestão e matrículas manuais funcionam 
 1. Em Plugins > Adicionar plugin > Enviar plugin, selecione nexo-cursos.zip e ative.
 2. Instale/ative WooCommerce para vendas e configure moeda, pagamento e emails.
 3. Abra Nexo Cursos e cadastre um curso. Selecione inscrição paga e informe o preço para criar o produto automaticamente. Nos gratuitos, a matrícula é feita após cadastro/login.
-4. Atribua usuários com papel Gerente de cursos para conceder acesso ao dashboard.
-5. Configure marca, logo e cores nas configurações do Nexo Cursos.
+4. Entre pela página Entrar e use a Área de gestão do site. O administrador define a equipe; gerentes cuidam dos cursos atribuídos e a coordenação administra os cursos e vendas.
+5. Configure marca, logo, cores, fontes e home na Área de gestão. O wp-admin permanece exclusivo do administrador.
 
 == Shortcodes ==
 [nexo_catalog] — catálogo público de cursos.
@@ -41,6 +41,9 @@ Desativar e excluir o plugin preserva os registros educacionais por padrão. A c
 As atualizações são distribuídas nas Releases públicas de https://github.com/paulommaeda/cursos. Instale a versão 1.1.0 uma vez para ativar o atualizador nas instalações 1.0.0. Consulte Plugins > Plugins instalados > Verificar atualizações. As atualizações automáticas são opcionais e controladas pelo WordPress.
 
 == Changelog ==
+= 1.4.0 =
+Área de gestão no próprio site para cursos, conteúdos, testes, alunos, matrículas, chamadas, produtos, vendas, pedidos, identidade, home e equipe. Painel WordPress reservado ao administrador. Tipografia maior, controles de toque e organização mobile first. Pedidos com controle de acesso por itens dos cursos, pagamentos, estoque, relatórios e reembolsos pelo WooCommerce.
+
 = 1.3.0 =
 Identidade Shalom em azul, paleta completa, fontes, capas por curso e home personalizável. Datas de início/fim, recorrência diária, semanal, quinzenal, mensal e personalizada, aulas presenciais automáticas, chamada por encontro e gráficos de frequência e cobertura. Histórico preservado em alterações de programação.
 = 1.2.0 =

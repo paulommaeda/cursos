@@ -52,9 +52,12 @@ def build(root: Path, output: Path, tag: str | None) -> tuple[str, int]:
 
     if not (root / "includes" / "class-commerce.php").is_file():
         raise ValueError("Course commerce module missing")
+    for required in ("includes/class-portal.php", "includes/class-portal-courses.php", "includes/class-portal-people.php", "includes/class-portal-orders.php", "includes/class-portal-sales.php", "includes/class-portal-brand.php", "assets/portal.css", "assets/portal.js", "assets/readability.css"):
+        if not (root / required).is_file():
+            raise ValueError("Front-office file missing: " + required)
     output.parent.mkdir(parents=True, exist_ok=True)
     with ZipFile(output, "w", ZIP_DEFLATED, compresslevel=9) as archive:
-        for path in sorted(paths):
+        for path in sorted(paths, key=lambda item: item.as_posix()):
             name = "nexo-cursos/" + path.relative_to(root).as_posix()
             entry = ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
             entry.create_system = 3
@@ -95,7 +98,7 @@ def build_theme(root: Path, output: Path, tag: str | None) -> tuple[str, int]:
             raise ValueError("Theme PHP contains leading output or BOM")
     output.parent.mkdir(parents=True, exist_ok=True)
     with ZipFile(output, "w", ZIP_DEFLATED, compresslevel=9) as archive:
-        for path in sorted(paths):
+        for path in sorted(paths, key=lambda item: item.as_posix()):
             entry = ZipInfo("shalom-formacao/" + path.name, date_time=(1980,1,1,0,0,0))
             entry.create_system = 3
             entry.external_attr = 0o100644 << 16

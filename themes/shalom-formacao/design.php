@@ -8,7 +8,7 @@ function shalom_design_fields(): array {
             'announcement'=>['Faixa superior','Uma fé que cresce. Uma vida que serve.'],
             'announcement_link'=>['Texto do link da faixa','Conheça nosso propósito ↗'],
             'announcement_url'=>['Destino do link da faixa','/#proposito','url'],
-            'nav_home'=>['Menu: início','Início'],'nav_catalog'=>['Menu: cursos','Cursos'],'nav_purpose'=>['Menu: propósito','Nosso propósito'],'nav_account'=>['Menu: meus cursos','Meus cursos'],'nav_dashboard'=>['Menu: gerente','Painel do gerente'],'nav_cart'=>['Menu: carrinho','Carrinho'],'nav_wcaccount'=>['Menu: conta','Minha conta'],'nav_login'=>['Menu: entrar','Entrar / cadastrar'],'nav_logout'=>['Menu: sair','Sair'],
+            'nav_home'=>['Menu: início','Início'],'nav_catalog'=>['Menu: cursos','Cursos'],'nav_purpose'=>['Menu: propósito','Nosso propósito'],'nav_account'=>['Menu: meus cursos','Meus cursos'],'nav_dashboard'=>['Menu: gestão','Área de gestão'],'nav_cart'=>['Menu: carrinho','Carrinho'],'nav_wcaccount'=>['Menu: conta','Minha conta'],'nav_login'=>['Menu: entrar','Entrar / cadastrar'],'nav_logout'=>['Menu: sair','Sair'],
             'show_announcement'=>['Exibir faixa superior',true,'checkbox'],'show_purpose_link'=>['Exibir propósito no menu',true,'checkbox'],'show_cart_link'=>['Exibir carrinho no menu',true,'checkbox'],
         ]],
         'hero'=>['Home: apresentação',[

@@ -6,7 +6,6 @@ final class Admin {
     private const TYPES = ['nexo_course', 'nexo_topic', 'nexo_lesson', 'nexo_quiz'];
     public static function boot(): void {
         add_action('admin_menu', [self::class, 'menu']);
-        add_filter('woocommerce_prevent_admin_access',static function($prevent){return current_user_can('nexo_manage_assigned')&&($_GET['page']??'')==='nexo-cursos'?false:$prevent;});
         add_action('admin_menu', [self::class, 'reorder_menu'], 99);
         add_action('admin_enqueue_scripts', [self::class, 'assets']);
         add_action('add_meta_boxes', [self::class, 'meta_boxes']);
@@ -21,7 +20,7 @@ final class Admin {
         return current_user_can('manage_options') || current_user_can('nexo_manage_assigned');
     }
     public static function menu(): void {
-        if (!self::allowed()) { return; }
+        if (!current_user_can('manage_options')) { return; }
         add_menu_page('Nexo Cursos', 'Nexo Cursos', 'read', 'nexo-cursos', [self::class, 'dashboard'], 'dashicons-welcome-learn-more', 26);
         add_submenu_page('nexo-cursos', 'Visão geral', 'Visão geral', 'read', 'nexo-cursos', [self::class, 'dashboard']);
         add_submenu_page('nexo-cursos', 'Identidade visual', 'Identidade visual', 'manage_options', 'nexo-identidade', [self::class, 'brand_page']);
@@ -214,7 +213,7 @@ final class Admin {
         echo '</div>';
     }
     public static function quiz_meta(\WP_Post $post): void {
-        $questions = get_post_meta($post->ID, '_nexo_questions', true); if (!is_array($questions)) { $questions = []; }
+        $questions = get_post_meta($post->ID, '_nexo_questions', true); if (!is_array($questions)) { $questions = []; } if(!$questions&&Portal::in_context()){$questions=[['question'=>'','options'=>['','','',''],'correct'=>0]];}
         echo '<label>Nota mínima para aprovação (%) <input type="number" min="0" max="100" name="nexo_pass_score" value="' . esc_attr(get_post_meta($post->ID, '_nexo_pass_score', true) === '' ? '70' : get_post_meta($post->ID, '_nexo_pass_score', true)) . '"></label><p>Cada pergunta tem uma resposta correta. As tentativas são livres. Perguntas vazias não serão salvas.</p><div id="nexo-questions">';
         foreach ($questions as $index => $question) { self::question_fields((string)$index, $question); }
         echo '</div><button type="button" class="button" id="nexo-add-question">＋ Adicionar pergunta</button><template id="nexo-question-template">'; self::question_fields('__INDEX__', ['question' => '', 'options' => ['', '', '', ''], 'correct' => 0]); echo '</template>';

@@ -78,7 +78,7 @@ final class Bootstrap {
         if ( isset( $_GET['nexo_pages_repaired'] ) ) { echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Páginas verificadas e criadas. As páginas existentes foram preservadas.', 'nexo-cursos' ) . '</p></div>'; }
     }
     public static function plugin_links( array $links ): array {
-        array_unshift( $links, '<a href="' . esc_url( admin_url( 'admin.php?page=nexo-cursos' ) ) . '">' . esc_html__( 'Abrir painel', 'nexo-cursos' ) . '</a>' );
+        array_unshift( $links, '<a href="' . esc_url( nexo_page_url('dashboard') ) . '">' . esc_html__( 'Abrir painel', 'nexo-cursos' ) . '</a>' );
         return $links;
     }
     public static function account_menu( array $items ): array {

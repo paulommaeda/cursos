@@ -69,7 +69,7 @@ final class Commerce {
             $p->set_virtual(true);$p->set_sold_individually(true);
             $p->set_catalog_visibility('visible');$p->set_reviews_allowed(false);
             $p->set_image_id((int)get_post_thumbnail_id($id));
-            $p->set_regular_price($valid_price?(string)$price:'');$p->set_sale_price('');
+            $p->set_regular_price($valid_price?(string)$price:'');$sale=get_post_meta($id,'_nexo_sale_price',true);$p->set_sale_price($valid_price&&is_numeric($sale)&&(float)$sale>=0&&(float)$sale<(float)$price?(string)$sale:'');
             $p->set_status($post->post_status==='publish' && $valid_price && !$post->post_password?'publish':'draft');
             $product_id=$p->save();
             if(!$product_id){throw new \RuntimeException('Product was not saved');}
@@ -97,7 +97,7 @@ final class Commerce {
         $atts=shortcode_atts(['brand'=>'yes'],$atts,'nexo_navigation');
         $items=['home'=>['label'=>'Início','url'=>home_url('/')],'catalog'=>['label'=>'Cursos','url'=>nexo_page_url('catalog')],'purpose'=>['label'=>'Nosso propósito','url'=>home_url('/#proposito')]];
         if(is_user_logged_in()){$items['account']=['label'=>'Meus cursos','url'=>nexo_page_url('account')];}
-        if(current_user_can('manage_options')||current_user_can('nexo_manage_assigned')){$items['dashboard']=['label'=>'Painel do gerente','url'=>nexo_page_url('dashboard')];}
+        if(Portal::allowed()){$items['dashboard']=['label'=>'Área de gestão','url'=>nexo_page_url('dashboard')];}
         if(function_exists('wc_get_cart_url')){$items['cart']=['label'=>'Carrinho','url'=>wc_get_cart_url()];}
         if(is_user_logged_in()){
             if(function_exists('wc_get_page_permalink')){$items['wcaccount']=['label'=>'Minha conta','url'=>wc_get_page_permalink('myaccount')];}
@@ -133,7 +133,7 @@ final class Commerce {
         else{$out.='<p class="nexo-muted">'.esc_html($settings['login_message']).'</p>';}
         if(isset($errors[$code])){$out.='<p class="nexo-notice nexo-notice-error" role="alert">'.esc_html($errors[$code]).'</p>';}
         $out.='<form method="post" action="'.esc_url(admin_url('admin-post.php')).'" class="nexo-student-auth"><input type="hidden" name="action" value="'.($register?'nexo_student_register':'nexo_student_login').'">'.wp_nonce_field($register?'nexo_student_register':'nexo_student_login','_nexo_auth_nonce',false,false).'<input type="hidden" name="nexo_free_course" value="'.($valid?$id:0).'">';
-        $redirect=isset($_GET['redirect_to'])&&is_string($_GET['redirect_to'])?wp_validate_redirect(esc_url_raw(wp_unslash($_GET['redirect_to'])),nexo_page_url('account')):nexo_page_url('account');
+        $redirect=isset($_GET['redirect_to'])&&is_string($_GET['redirect_to'])?wp_validate_redirect(esc_url_raw(wp_unslash($_GET['redirect_to'])),nexo_page_url('account')):'';
         $out.='<input type="hidden" name="redirect_to" value="'.esc_attr($redirect).'">';
         if($register){$out.='<p><label for="nexo-full-name">Nome completo</label><input id="nexo-full-name" name="full_name" autocomplete="name" required maxlength="120"></p>';}
         $out.='<p><label for="nexo-user-email">'.($register?'E-mail':'E-mail ou nome de usuário').'</label><input id="nexo-user-email" name="user_email" type="'.($register?'email':'text').'" autocomplete="username" required maxlength="254"></p><p><label for="nexo-user-password">Senha</label><input id="nexo-user-password" name="user_password" type="password" autocomplete="'.($register?'new-password':'current-password').'" required '.($register?'minlength="8"':'').' maxlength="128"></p>';
@@ -162,7 +162,8 @@ final class Commerce {
     private static function destination(int $id): string {
         if($id && self::is_free($id)){return get_permalink($id);}
         $raw=$_POST['redirect_to']??'';
-        return is_string($raw)?wp_validate_redirect(esc_url_raw(wp_unslash($raw)),nexo_page_url('account')):nexo_page_url('account');
+        $fallback=Portal::allowed()?Portal::url():nexo_page_url('account');
+        return is_string($raw)&&$raw!==''?wp_validate_redirect(esc_url_raw(wp_unslash($raw)),$fallback):$fallback;
     }
     public static function student_login(): void {
         self::check_request('nexo_student_login');$id=self::intent();
