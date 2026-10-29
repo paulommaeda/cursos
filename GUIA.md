@@ -1,4 +1,4 @@
-# Área de gestão Shalom — versão 1.4.0
+# Área de gestão Shalom — versão 1.4.1
 
 ## Instalação e acesso
 

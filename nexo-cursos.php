@@ -4,7 +4,7 @@
  * Description: Gestão de cursos EAD ou presenciais, matrículas, avaliações, gerentes e vendas com WooCommerce.
  * Plugin URI: https://github.com/paulommaeda/cursos
  * Update URI: https://github.com/paulommaeda/cursos
- * Version: 1.4.0
+ * Version: 1.4.1
  * Requires at least: 6.4
  * Requires PHP: 8.1
  * Author: Nexo Cursos
@@ -14,7 +14,7 @@
  * WC requires at least: 8.2
  */
 defined( 'ABSPATH' ) || exit;
-define( 'NEXO_VERSION', '1.4.0' );
+define( 'NEXO_VERSION', '1.4.1' );
 define( 'NEXO_FILE', __FILE__ );
 define( 'NEXO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NEXO_URL', plugin_dir_url( __FILE__ ) );
