@@ -52,7 +52,7 @@ def build(root: Path, output: Path, tag: str | None) -> tuple[str, int]:
 
     if not (root / "includes" / "class-commerce.php").is_file():
         raise ValueError("Course commerce module missing")
-    for required in ("includes/class-portal.php", "includes/class-portal-courses.php", "includes/class-portal-people.php", "includes/class-portal-orders.php", "includes/class-portal-sales.php", "includes/class-portal-brand.php", "assets/portal.css", "assets/portal.js", "assets/readability.css"):
+    for required in ("includes/class-quick-enrollment.php", "includes/class-portal.php", "includes/class-portal-courses.php", "includes/class-portal-people.php", "includes/class-portal-orders.php", "includes/class-portal-sales.php", "includes/class-portal-brand.php", "assets/portal.css", "assets/portal.js", "assets/readability.css"):
         if not (root / required).is_file():
             raise ValueError("Front-office file missing: " + required)
     output.parent.mkdir(parents=True, exist_ok=True)

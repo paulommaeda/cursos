@@ -23,3 +23,25 @@
   if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeNavigation); }
   else { initializeNavigation(); }
 }());
+(function () {
+  'use strict';
+  function initializeQuickEnrollment() {
+    document.querySelectorAll('.nexo-quick-reveal').forEach(function (button) {
+      button.hidden = false;
+      button.addEventListener('click', function () {
+        const input = document.getElementById(button.dataset.password);
+        if (!input) return;
+        const reveal = input.type === 'password'; input.type = reveal ? 'text' : 'password';
+        button.textContent = reveal ? 'Ocultar' : 'Mostrar'; button.setAttribute('aria-pressed', String(reveal));
+      });
+    });
+    document.querySelectorAll('.nexo-quick-form').forEach(function (form) {
+      form.addEventListener('submit', function () {
+        if (!form.checkValidity()) return;
+        const submit = form.querySelector('button[type="submit"]');
+        if (submit) { submit.disabled = true; submit.setAttribute('aria-busy', 'true'); submit.textContent = 'Confirmando matrícula…'; }
+      });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeQuickEnrollment); else initializeQuickEnrollment();
+}());

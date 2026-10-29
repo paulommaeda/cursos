@@ -11,7 +11,7 @@ on:
         description: 'Versao estavel que coincide com o codigo selecionado (vX.Y.Z)'
         required: true
         type: string
-        default: 'v1.4.1'
+        default: 'v1.5.0'
 
 permissions:
   contents: read

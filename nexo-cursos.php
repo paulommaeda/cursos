@@ -4,7 +4,7 @@
  * Description: Gestão de cursos EAD ou presenciais, matrículas, avaliações, gerentes e vendas com WooCommerce.
  * Plugin URI: https://github.com/paulommaeda/cursos
  * Update URI: https://github.com/paulommaeda/cursos
- * Version: 1.4.1
+ * Version: 1.5.0
  * Requires at least: 6.4
  * Requires PHP: 8.1
  * Author: Nexo Cursos
@@ -14,7 +14,7 @@
  * WC requires at least: 8.2
  */
 defined( 'ABSPATH' ) || exit;
-define( 'NEXO_VERSION', '1.4.1' );
+define( 'NEXO_VERSION', '1.5.0' );
 define( 'NEXO_FILE', __FILE__ );
 define( 'NEXO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NEXO_URL', plugin_dir_url( __FILE__ ) );
@@ -46,6 +46,7 @@ function nexo_page_url( string $key ): string {
 }
 require_once NEXO_DIR . 'includes/class-core.php';
 require_once NEXO_DIR . 'includes/class-commerce.php';
+require_once NEXO_DIR . 'includes/class-quick-enrollment.php';
 require_once NEXO_DIR . 'includes/class-calendar.php';
 require_once NEXO_DIR . 'includes/class-classroom.php';
 require_once NEXO_DIR . 'includes/class-portal.php';
@@ -70,6 +71,7 @@ add_action( 'plugins_loaded', static function () {
     \NexoCursos\Portal::boot();
     \NexoCursos\PortalOrders::boot();
     \NexoCursos\Commerce::boot();
+    \NexoCursos\QuickEnrollment::boot();
     \NexoCursos\Calendar::boot();
     \NexoCursos\Classroom::boot();
     \NexoCursos\Admin::boot();

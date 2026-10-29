@@ -1,4 +1,4 @@
-# Nexo Cursos e Shalom Formação — 1.4.1
+# Nexo Cursos e Shalom Formação — 1.5.0
 
 Plugin WordPress e tema para cursos livres da Igreja Shalom: discipular, aperfeiçoar e enviar, conforme Efésios 4:12. Gestão EAD ou presencial, com tópicos, aulas e testes opcionais e vendas pelo WooCommerce.
 
@@ -15,7 +15,7 @@ Requisitos: WordPress 6.4+, PHP 8.1+ e WooCommerce 8.2+ para vendas. Cursos grat
 
 ## Cursos e aulas presenciais
 
-Cursos gratuitos levam ao cadastro/login e à matrícula direta. Cursos pagos criam um produto virtual, sincronizando título, descrição, resumo, capa e preços. Vínculos manuais anteriores são preservados. Progresso, testes e dados de aprendizagem continuam protegidos.
+Cursos gratuitos têm cadastro rápido na própria página: nome, e-mail e senha criam a conta e confirmam automaticamente a matrícula no curso de origem. Quem já tem conta entra ali mesmo; quem já está conectado confirma em um toque. Cursos pagos criam um produto virtual, sincronizando título, descrição, resumo, capa e preços. Vínculos manuais anteriores são preservados. Progresso, testes e dados de aprendizagem continuam protegidos.
 
 Defina início, fim, horário, duração e frequência para gerar aulas presenciais: encontro único, diário, dias úteis, semanal, quinzenal, mensal ou intervalo personalizado. A geração não duplica datas nem apaga histórico. Registre a chamada por encontro e acompanhe frequência, cobertura e pendências por aluno e por aula. Campos em branco não são faltas automáticas.
 
@@ -48,7 +48,7 @@ O publicador preserva tags e Releases já existentes. Para corrigir uma versão 
 O plugin fica na raiz do repositório e o tema em `themes/shalom-formacao`. A montagem inclui somente arquivos de produção, mantendo as pastas `nexo-cursos/` e `shalom-formacao/` dentro dos ZIPs. Testes locais, credenciais e dados demonstrativos ficam fora dos pacotes.
 
 ```sh
-python3 tools/build-release.py --tag v1.4.1
+python3 tools/build-release.py --tag v1.5.0
 ```
 
 ## Dados e alcance

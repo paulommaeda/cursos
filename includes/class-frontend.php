@@ -199,11 +199,12 @@ final class Frontend {
         $access = is_user_logged_in() && Core::has_access( $id ); $mode = get_post_meta( $id, '_nexo_mode', true ) === 'erp' ? 'erp' : 'online'; $items = self::ordered_curriculum( Core::curriculum( $id ) );
         $out .= '<a class="nexo-back" href="' . esc_url( nexo_page_url( $access ? 'account' : 'catalog' ) ) . '">← ' . esc_html( $access ? 'Meus cursos' : 'Todos os cursos' ) . '</a><section class="nexo-course-heading"><div><span class="nexo-eyebrow">' . esc_html( $mode === 'erp' ? 'CURSO PRESENCIAL / GESTÃO' : 'SEU PRÓXIMO PASSO' ) . '</span><h1>' . esc_html( $course->post_title ) . '</h1>' . ( $course->post_excerpt ? '<p>' . esc_html( $course->post_excerpt ) . '</p>' : '' ) . '</div>' . ( $access ? '<span class="nexo-status nexo-status-active">' . self::icon( 'check' ) . ' Matrícula ativa</span>' : '' ) . '</section>' . self::feedback();
         if ( ! $access || $mode === 'erp' ) {
-            $out .= '<div class="nexo-overview-layout"><article class="nexo-panel nexo-course-description"><h2>Sobre o curso</h2><div class="nexo-prose">' . self::render_content( $course->post_content ) . '</div>';
+            $quick=!$access&&Commerce::is_free((int)$id);
+            $out .= '<div class="nexo-overview-layout'.($quick?' nexo-free-course-layout':'').'">'.($quick?self::enrollment_panel($course,$access,$mode):'').'<article class="nexo-panel nexo-course-description">'.($quick?get_the_post_thumbnail($id,'large',['class'=>'nexo-free-course-image','alt'=>'']):'').'<h2>Sobre o curso</h2><div class="nexo-prose">' . self::render_content( $course->post_content ) . '</div>';
             if ( ! $course->post_content ) { $out .= '<p class="nexo-muted">As informações deste curso serão publicadas em breve.</p>'; }
             if ( $mode === 'online' && $items ) { $out .= '<h2 class="nexo-space-top">O que você vai encontrar</h2>' . self::public_curriculum( $items ); }
             if ( $access && $mode === 'erp' ) { $out .= self::attendance_panel( $id ); }
-            $out .= '</article>' . self::enrollment_panel( $course, $access, $mode ) . '</div>';
+            $out .= '</article>' . ($quick?'':self::enrollment_panel( $course, $access, $mode )) . '</div>';
         } else { $out .= self::learning( $course, $items ); }
         return $out . self::shell_close();
     }
@@ -219,12 +220,12 @@ final class Frontend {
 
     private static function enrollment_panel( \WP_Post $course, bool $access, string $mode ): string {
         $id = $course->ID;
-        $out = '<aside class="nexo-panel nexo-enrollment-panel">' . get_the_post_thumbnail( $id, 'medium_large', array( 'class' => 'nexo-overview-image', 'alt' => '' ) );
-        $out .= '<span class="nexo-eyebrow">' . esc_html( $access ? 'INFORMAÇÕES DA MATRÍCULA' : 'INVISTA NO SEU PRÓXIMO PASSO' ) . '</span>';
+        $quick=!$access&&Commerce::is_free((int)$id);
+        $out = '<aside class="nexo-panel nexo-enrollment-panel'.($quick?' nexo-quick-card':'').'">' . ($quick?'':get_the_post_thumbnail( $id, 'medium_large', array( 'class' => 'nexo-overview-image', 'alt' => '' ) ));
+        if(!$quick){$out .= '<span class="nexo-eyebrow">' . esc_html( $access ? 'INFORMAÇÕES DA MATRÍCULA' : 'INVISTA NO SEU PRÓXIMO PASSO' ) . '</span>';}
         $product = function_exists( 'wc_get_product' ) ? wc_get_product( absint( get_post_meta( $id, '_nexo_product_id', true ) ) ) : false;
         if (!$access && Commerce::is_free((int)$id)) {
-            $out .= '<div class="nexo-detail-price">Gratuito</div><p class="nexo-muted">Uma oportunidade para aprender, crescer e servir.</p>';
-            $out .= is_user_logged_in() ? Commerce::join_form((int)$id) : '<a class="nexo-button nexo-button-wide" href="'.esc_url(Commerce::entry_url((int)$id)).'">Entrar ou cadastrar para participar →</a>';
+            $out .= QuickEnrollment::panel((int)$id);
         }
         elseif ( ! $access && $product && $product->get_status() === 'publish' && Commerce::pricing_mode((int)$id)==='paid' ) { $out .= '<div class="nexo-detail-price">' . wp_kses_post( $product->get_price_html() ) . '</div><a class="nexo-button nexo-button-wide" href="' . esc_url( $product->get_permalink() ) . '">Ver produto e comprar ' . self::icon( 'arrow' ) . '</a><p class="nexo-small nexo-muted">A matrícula é liberada após a confirmação do pagamento. Use sua conta na compra para acessar o curso.</p>'; }
         elseif ( ! $access ) { $out .= '<h3>Inscrições e informações</h3><p class="nexo-muted">Consulte a equipe responsável para saber como participar deste curso.</p>'; }
@@ -238,7 +239,7 @@ final class Frontend {
         if ( $location ) { $facts[] = array( 'location', 'Local', $location ); }
         foreach ( $facts as $fact ) { $out .= '<div><dt>' . self::icon( $fact[0] ) . esc_html( $fact[1] ) . '</dt><dd>' . esc_html( $fact[2] ) . '</dd></div>'; }
         $out .= '</dl>';
-        if ( ! is_user_logged_in() ) { $out .= '<p class="nexo-small">Já é aluno? <a href="' . esc_url( add_query_arg( 'redirect_to', get_permalink( $id ), nexo_page_url( 'login' ) ) ) . '">Entre na sua conta</a>.</p>'; }
+        if ( ! is_user_logged_in() && !$quick ) { $out .= '<p class="nexo-small">Já é aluno? <a href="' . esc_url( add_query_arg( 'redirect_to', get_permalink( $id ), nexo_page_url( 'login' ) ) ) . '">Entre na sua conta</a>.</p>'; }
         return $out . '</aside>';
     }
 

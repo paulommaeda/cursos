@@ -3,7 +3,7 @@ Contributors: nexo-cursos
 Tags: courses, lms, woocommerce, education, erp
 Requires at least: 6.4
 Requires PHP: 8.1
-Stable tag: 1.4.1
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,7 +23,7 @@ WooCommerce é necessário para vendas. Gestão e matrículas manuais funcionam 
 == Installation ==
 1. Em Plugins > Adicionar plugin > Enviar plugin, selecione nexo-cursos.zip e ative.
 2. Instale/ative WooCommerce para vendas e configure moeda, pagamento e emails.
-3. Abra Nexo Cursos e cadastre um curso. Selecione inscrição paga e informe o preço para criar o produto automaticamente. Nos gratuitos, a matrícula é feita após cadastro/login.
+3. Abra Nexo Cursos e cadastre um curso. Selecione inscrição paga e informe o preço para criar o produto automaticamente. Nos gratuitos, o aluno informa nome, e-mail e senha na página do curso e já fica conectado e matriculado naquele curso. Quem já tem conta entra no mesmo local.
 4. Entre pela página Entrar e use a Área de gestão do site. O administrador define a equipe; gerentes cuidam dos cursos atribuídos e a coordenação administra os cursos e vendas.
 5. Configure marca, logo, cores, fontes e home na Área de gestão. O wp-admin permanece exclusivo do administrador.
 
@@ -41,6 +41,9 @@ Desativar e excluir o plugin preserva os registros educacionais por padrão. A c
 As atualizações são distribuídas nas Releases públicas de https://github.com/paulommaeda/cursos. Instale a versão 1.1.0 uma vez para ativar o atualizador nas instalações 1.0.0. Consulte Plugins > Plugins instalados > Verificar atualizações. As atualizações automáticas são opcionais e controladas pelo WordPress.
 
 == Changelog ==
+= 1.5.0 =
+Cadastro rápido de cursos gratuitos na própria página: nome, e-mail e senha, login automático e matrícula no curso de origem. Acesso com conta existente e confirmação em um toque para alunos conectados. Formulários mobile first com validação, proteção por curso e sessão, controle de tentativas e tratamento de e-mail já cadastrado.
+
 = 1.4.1 =
 Permite ao administrador editar e localizar gerentes da loja pela gestão do site, preservando a proteção das contas administrativas.
 

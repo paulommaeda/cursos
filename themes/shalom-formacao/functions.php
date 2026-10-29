@@ -46,8 +46,8 @@ function shalom_restore_home(string $name,\WP_Theme $new,\WP_Theme $old): void {
 }
 add_action('switch_theme','shalom_restore_home',10,3);
 function shalom_dependency_notice(): void {
-    if(!current_user_can('activate_plugins')){return;}if(class_exists('NexoCursos\\Commerce')&&defined('NEXO_VERSION')&&version_compare(NEXO_VERSION,'1.4.1','>=')){return;}
-    echo '<div class="notice notice-warning"><p>O tema Shalom Formação usa o Nexo Cursos para catálogo, navegação e matrículas. Instale ou atualize para Nexo Cursos 1.4.1 ou superior e ative o plugin que acompanha o tema.</p><p><a href="'.esc_url(admin_url('plugins.php')).'">Abrir plugins</a></p></div>';
+    if(!current_user_can('activate_plugins')){return;}if(class_exists('NexoCursos\\Commerce')&&defined('NEXO_VERSION')&&version_compare(NEXO_VERSION,'1.5.0','>=')){return;}
+    echo '<div class="notice notice-warning"><p>O tema Shalom Formação usa o Nexo Cursos para catálogo, navegação e matrículas. Instale ou atualize para Nexo Cursos 1.5.0 ou superior e ative o plugin que acompanha o tema.</p><p><a href="'.esc_url(admin_url('plugins.php')).'">Abrir plugins</a></p></div>';
 }
 add_action('admin_notices','shalom_dependency_notice');
 add_action('after_setup_theme',static function(){

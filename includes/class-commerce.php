@@ -27,7 +27,7 @@ final class Commerce {
         return $id>0 && get_post_type($id)==='nexo_course' && get_post_status($id)==='publish' && !post_password_required($id) && self::pricing_mode($id)==='free';
     }
     public static function entry_url(int $id): string {
-        return add_query_arg(['nexo_free_course'=>$id],nexo_page_url('login'));
+        return QuickEnrollment::url($id);
     }
     public static function enroll_free(int $id,int $user_id) {
         if(!self::is_free($id) || !$user_id || !get_userdata($user_id)){return new \WP_Error('nexo_not_free','Este curso não está disponível para matrícula gratuita.');}
@@ -150,7 +150,7 @@ final class Commerce {
         if(($_SERVER['REQUEST_METHOD']??'')!=='POST'){wp_die('Ação não permitida.','',['response'=>405]);}
         check_admin_referer($action,'_nexo_auth_nonce');
     }
-    private static function rate_limit(string $action,int $max): bool {
+    public static function auth_rate_limit(string $action,int $max): bool {
         $ip=(string)($_SERVER['REMOTE_ADDR']??'local');
         $key='nexo_auth_'.$action.'_'.hash_hmac('sha256',$ip,wp_salt('nonce'));
         $count=(int)get_transient($key);set_transient($key,$count+1,15*MINUTE_IN_SECONDS);
@@ -167,7 +167,7 @@ final class Commerce {
     }
     public static function student_login(): void {
         self::check_request('nexo_student_login');$id=self::intent();
-        if(self::rate_limit('login',20)){self::auth_error('limit',$id);}
+        if(self::auth_rate_limit('login',20)){self::auth_error('limit',$id);}
         if(!is_string($_POST['user_email']??null)||!is_string($_POST['user_password']??null)){self::auth_error('credentials',$id);}
         $user=wp_signon(['user_login'=>sanitize_text_field(wp_unslash($_POST['user_email']??'')),'user_password'=>(string)wp_unslash($_POST['user_password']??''),'remember'=>!empty($_POST['rememberme'])],is_ssl());
         if(is_wp_error($user)){self::auth_error('credentials',$id);}
@@ -192,7 +192,7 @@ final class Commerce {
     public static function student_register(): void {
         self::check_request('nexo_student_register');$id=self::intent();
         if(is_user_logged_in()){wp_safe_redirect(self::auth_url($id));exit;}
-        if(self::rate_limit('register',8)){self::auth_error('limit',$id,true);}
+        if(self::auth_rate_limit('register',8)){self::auth_error('limit',$id,true);}
         if($id && !self::is_free($id)){self::auth_error('course',$id,true);}
         $user=self::create_student(wp_unslash($_POST));
         if(is_wp_error($user)){self::auth_error($user->get_error_code(),$id,true);}

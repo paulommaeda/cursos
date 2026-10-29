@@ -1,4 +1,4 @@
-# Área de gestão Shalom — versão 1.4.1
+# Área de gestão Shalom — versão 1.5.0
 
 ## Instalação e acesso
 
@@ -32,6 +32,16 @@ Vínculos anteriores com produtos manuais são preservados. O estoque controla a
 Em **Conteúdos e testes**, selecione o curso para criar tópicos, aulas e testes. Todos são opcionais. Organize por ordem numérica, associe um tópico quando desejar e adicione o vídeo de uma aula ou seu texto. Nos testes, informe as perguntas, duas a seis alternativas por pergunta, a resposta correta e a nota mínima. O conteúdo principal do curso é público; aulas, tópicos e testes ficam protegidos para quem tem acesso. As tentativas dos testes preservam a melhor nota.
 
 **Voltar para rascunho** oculta o curso do catálogo, desativa a venda do produto automático e suspende o acesso dos alunos até republicar. Não apaga matrículas, conteúdos ou histórico. Conteúdos também podem ser movidos para rascunho.
+
+## Inscrição rápida em cursos gratuitos
+
+Defina **Inscrição → Gratuita** no curso e publique. Os botões do catálogo e da home levam direto ao bloco **Cadastro rápido** na página daquele curso. Não é necessário configurar uma página extra.
+
+O visitante informa apenas **nome completo, e-mail e senha** e toca em **Cadastrar e me matricular**. A conta de aluno é criada, o acesso é iniciado e a matrícula é confirmada automaticamente no curso de origem. Não passa pelo carrinho nem cria pedido. Funciona para cursos on-line e presenciais. No celular, o formulário aparece antes da descrição completa.
+
+Quem já tem conta escolhe **Já tenho conta** e usa seu e-mail ou nome de usuário e senha: ao entrar, já fica matriculado no mesmo curso. Quem já está conectado só confirma a matrícula gratuita. Se já estiver matriculado, acessa normalmente o curso. E-mail já cadastrado orienta a entrar na conta existente; não cria outra conta.
+
+Os dados são enviados ao próprio curso. A matrícula é revalidada no envio; cursos pagos, privados ou em rascunho não aceitam inscrição gratuita. As páginas e formulários usam cabeçalhos para impedir cache, um cookie necessário de inscrição e proteção por sessão e curso. Mantenha as páginas dos cursos fora do cache de página/CDN e habilite HTTPS na hospedagem. A recuperação de senha usa o e-mail configurado no WordPress.
 
 ## Alunos e matrículas
 
