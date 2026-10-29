@@ -4,7 +4,7 @@
  * Description: Gestão de cursos EAD ou presenciais, matrículas, avaliações, gerentes e vendas com WooCommerce.
  * Plugin URI: https://github.com/paulommaeda/cursos
  * Update URI: https://github.com/paulommaeda/cursos
- * Version: 1.2.0
+ * Version: 1.3.0
  * Requires at least: 6.4
  * Requires PHP: 8.1
  * Author: Nexo Cursos
@@ -14,24 +14,27 @@
  * WC requires at least: 8.2
  */
 defined( 'ABSPATH' ) || exit;
-define( 'NEXO_VERSION', '1.2.0' );
+define( 'NEXO_VERSION', '1.3.0' );
 define( 'NEXO_FILE', __FILE__ );
 define( 'NEXO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NEXO_URL', plugin_dir_url( __FILE__ ) );
+require_once NEXO_DIR . 'includes/class-brand.php';
 
 function nexo_settings(): array {
-    $defaults = array( 'brand_name' => 'Nexo Cursos', 'primary_color' => '#167b60', 'accent_color' => '#dbef8c', 'logo_id' => 0, 'login_title' => 'Bem-vindo de volta', 'login_message' => 'Seu próximo passo começa aqui.' );
+    $defaults = array( 'brand_name' => 'Nexo Cursos', 'logo_id' => 0, 'login_title' => 'Bem-vindo de volta', 'login_message' => 'Seu próximo passo começa aqui.' );
+    $defaults = array_merge($defaults, \NexoCursos\Brand::defaults());
     $stored = get_option( 'nexo_settings', array() );
     $options = wp_parse_args( is_array( $stored ) ? $stored : array(), $defaults );
     foreach ( array( 'brand_name', 'login_title', 'login_message' ) as $key ) { $options[ $key ] = sanitize_text_field( $options[ $key ] ); }
-    foreach ( array( 'primary_color', 'accent_color' ) as $key ) { $options[ $key ] = sanitize_hex_color( $options[ $key ] ) ?: $defaults[ $key ]; }
+    foreach ( array_keys(\NexoCursos\Brand::colors()) as $key ) { $options[ $key ] = sanitize_hex_color( $options[ $key ] ) ?: $defaults[ $key ]; }
     $options['logo_id'] = absint( $options['logo_id'] );
+    $options = \NexoCursos\Brand::sanitize($options,$options);
     return apply_filters( 'nexo_settings', $options );
 }
 /** CSS declarations for an escaped style attribute or stylesheet rule. */
 function nexo_brand_styles(): string {
     $o = nexo_settings();
-    return '--nexo-primary:' . $o['primary_color'] . ';--nexo-accent:' . $o['accent_color'] . ';--nexo-brand:' . $o['primary_color'] . ';--nexo-highlight:' . $o['accent_color'] . ';';
+    return '--nexo-primary:' . $o['primary_color'] . ';--nexo-accent:' . $o['accent_color'] . ';--nexo-brand:' . $o['primary_color'] . ';--nexo-highlight:' . $o['accent_color'] . ';' . \NexoCursos\Brand::variables($o);
 }
 function nexo_page_url( string $key ): string {
     $pages = get_option( 'nexo_pages', array() );
@@ -43,6 +46,8 @@ function nexo_page_url( string $key ): string {
 }
 require_once NEXO_DIR . 'includes/class-core.php';
 require_once NEXO_DIR . 'includes/class-commerce.php';
+require_once NEXO_DIR . 'includes/class-calendar.php';
+require_once NEXO_DIR . 'includes/class-classroom.php';
 require_once NEXO_DIR . 'includes/class-admin.php';
 require_once NEXO_DIR . 'includes/class-frontend.php';
 require_once NEXO_DIR . 'includes/class-bootstrap.php';
@@ -57,6 +62,8 @@ add_action( 'before_woocommerce_init', static function () {
 add_action( 'plugins_loaded', static function () {
     \NexoCursos\Core::boot();
     \NexoCursos\Commerce::boot();
+    \NexoCursos\Calendar::boot();
+    \NexoCursos\Classroom::boot();
     \NexoCursos\Admin::boot();
     \NexoCursos\Frontend::boot();
     \NexoCursos\Bootstrap::boot();

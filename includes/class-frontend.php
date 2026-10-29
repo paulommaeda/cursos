@@ -115,7 +115,7 @@ final class Frontend {
         $atts = shortcode_atts(['limit'=>3],$atts,'nexo_available_courses');
         $courses = get_posts(['post_type'=>'nexo_course','post_status'=>'publish','numberposts'=>min(12,max(1,absint($atts['limit']))),'orderby'=>'date','order'=>'DESC','has_password'=>false]);
         $out = '<div class="nexo-app nexo-available-courses" style="'.esc_attr(nexo_brand_styles()).'">';
-        if (!$courses) { return $out.self::empty_state('Novas jornadas estão sendo preparadas','Em breve, você encontrará aqui os cursos disponíveis para sua formação.').'</div>'; }
+        if (!$courses) { return $out.self::empty_state('Novas jornadas estão sendo preparadas',apply_filters('nexo_available_empty_message','Em breve, você encontrará aqui os cursos disponíveis para sua formação.')).'</div>'; }
         $out .= '<div class="nexo-course-grid">';
         foreach ($courses as $course) { $out .= self::course_card($course, is_user_logged_in() && Core::has_access((int)$course->ID)); }
         return $out.'</div></div>';
@@ -150,8 +150,8 @@ final class Frontend {
         $duration = get_post_meta( $course->ID, '_nexo_workload', true );
         $description = $course->post_excerpt ?: wp_trim_words( wp_strip_all_tags( strip_shortcodes( $course->post_content ) ), 19 );
         $image = get_the_post_thumbnail( $course->ID, 'medium_large', array( 'loading' => 'lazy', 'class' => 'nexo-course-image', 'alt' => '' ) );
-        $art = $image ?: '<div class="nexo-course-art nexo-course-art-' . ( ( $course->ID % 4 ) + 1 ) . '" aria-hidden="true"><span class="nexo-course-art-orbit"></span>' . self::icon( $mode === 'erp' ? 'users' : 'book' ) . '<span class="nexo-course-art-caption">' . esc_html(current_theme_supports('nexo-navigation') ? 'Crescer para servir.' : ($mode === 'erp' ? 'Conecte-se. Evolua.' : 'Conhecimento em movimento.')) . '</span></div>';
-        $out = '<article class="nexo-course-card"><a class="nexo-course-cover" href="' . esc_url( $cover_target ) . '" aria-label="' . esc_attr( 'Ver curso: ' . $course->post_title ) . '">' . $art . '<span class="nexo-cover-badge">' . esc_html( $mode === 'erp' ? 'Presencial / gestão' : 'On-line' ) . '</span></a><div class="nexo-card-body"><div class="nexo-card-meta"><span>' . self::icon( $mode === 'erp' ? 'users' : 'play' ) . esc_html( $mode === 'erp' ? 'Experiência presencial' : 'Aprenda no seu ritmo' ) . '</span>' . ( $duration ? '<span>' . esc_html( $duration ) . '</span>' : '' ) . '</div><h3><a href="' . esc_url( $cover_target ) . '">' . esc_html( $course->post_title ) . '</a></h3><p>' . esc_html( $description ) . '</p>';
+        $art = $image ?: '<div class="nexo-course-art nexo-course-art-' . ( ( $course->ID % 4 ) + 1 ) . '" aria-hidden="true"><span class="nexo-course-art-orbit"></span>' . self::icon( $mode === 'erp' ? 'users' : 'book' ) . '<span class="nexo-course-art-caption">' . esc_html(get_post_meta($course->ID,'_nexo_course_tagline',true) ?: (current_theme_supports('nexo-navigation') ? 'Crescer para servir.' : ($mode === 'erp' ? 'Conecte-se. Evolua.' : 'Conhecimento em movimento.'))) . '</span></div>';
+        $out = '<article class="nexo-course-card" style="'.esc_attr(Brand::course_style((int)$course->ID)).'"><a class="nexo-course-cover" href="' . esc_url( $cover_target ) . '" aria-label="' . esc_attr( 'Ver curso: ' . $course->post_title ) . '">' . $art . '<span class="nexo-cover-badge">' . esc_html( $mode === 'erp' ? 'Presencial / gestão' : 'On-line' ) . '</span></a><div class="nexo-card-body"><div class="nexo-card-meta"><span>' . self::icon( $mode === 'erp' ? 'users' : 'play' ) . esc_html( $mode === 'erp' ? 'Experiência presencial' : 'Aprenda no seu ritmo' ) . '</span>' . ( $duration ? '<span>' . esc_html( $duration ) . '</span>' : '' ) . '</div><h3><a href="' . esc_url( $cover_target ) . '">' . esc_html( $course->post_title ) . '</a></h3><p>' . esc_html( $description ) . '</p>';
         if ( $enrolled && $mode === 'online' ) {
             $progress = Core::progress( $course->ID ); $percent = min( 100, max( 0, (int) ( $progress['percent'] ?? 0 ) ) );
             $out .= '<div class="nexo-progress-label"><span>Seu progresso</span><strong>' . $percent . '%</strong></div><progress class="nexo-progress" max="100" value="' . $percent . '">' . $percent . '%</progress>';
@@ -234,6 +234,7 @@ final class Frontend {
         $duration = get_post_meta( $id, '_nexo_workload', true ); $date = get_post_meta( $id, '_nexo_start_date', true ); $location = get_post_meta( $id, '_nexo_location', true );
         if ( $duration ) { $facts[] = array( 'calendar', 'Carga horária', $duration ); }
         if ( $date ) { $facts[] = array( 'calendar', 'Início', self::date_label( $date ) ); }
+        $end=get_post_meta($id,'_nexo_end_date',true);if($end){$facts[]=array('calendar','Término',self::date_label($end));}
         if ( $location ) { $facts[] = array( 'location', 'Local', $location ); }
         foreach ( $facts as $fact ) { $out .= '<div><dt>' . self::icon( $fact[0] ) . esc_html( $fact[1] ) . '</dt><dd>' . esc_html( $fact[2] ) . '</dd></div>'; }
         $out .= '</dl>';
@@ -247,8 +248,9 @@ final class Frontend {
     }
 
     private static function attendance_panel( int $id ): string {
-        $attendance = Core::attendance( $id, get_current_user_id() ); $out = '<h2 class="nexo-space-top">Minha presença</h2>';
-        if ( ! $attendance ) { return $out . '<p class="nexo-muted">As presenças registradas pelo gerente aparecerão aqui.</p>'; }
+        $attendance = Core::attendance( $id, get_current_user_id() ); $scheduled=Calendar::student_panel($id);
+        if (!$attendance) { return $scheduled ?: '<h2 class="nexo-space-top">Minha presença</h2><p class="nexo-muted">As aulas e presenças aparecerão aqui quando a programação for publicada.</p>'; }
+        $out=$scheduled.'<h2 class="nexo-space-top">Registros anteriores por data</h2>';
         krsort( $attendance ); $labels = array( 'present' => 'Presente', 'absent' => 'Ausente', 'excused' => 'Falta justificada' );
         $out .= '<div class="nexo-table-wrap"><table class="nexo-table"><thead><tr><th scope="col">Data</th><th scope="col">Registro</th></tr></thead><tbody>';
         foreach ( $attendance as $date => $status ) { $out .= '<tr><td>' . esc_html( self::date_label( (string) $date ) ) . '</td><td><span class="nexo-status ' . ( $status === 'present' ? 'nexo-status-active' : '' ) . '">' . esc_html( $labels[ $status ] ?? $status ) . '</span></td></tr>'; }
@@ -335,7 +337,9 @@ final class Frontend {
             }
             $out .= '</tbody></table></div>';
         } else { $out .= '<p class="nexo-muted">Os cursos criados e atribuídos a você aparecerão aqui.</p>'; }
-        return $out . '</section>' . self::shell_close();
+        $out.='</section>';
+        foreach($courses as $course){if(get_post_meta($course->ID,'_nexo_mode',true)!=='erp'||!Core::can_manage((int)$course->ID)){continue;}ob_start();Classroom::engagement(Calendar::summary((int)$course->ID));$chart=ob_get_clean();$out.='<section class="nexo-panel nexo-space-top"><h2>'.esc_html($course->post_title).'</h2>'.$chart.'<a class="nexo-button" href="'.esc_url(add_query_arg('course_id',$course->ID,admin_url('admin.php?page=nexo-cursos')).'#nexo-classroom').'">Abrir calendário e chamada</a></section>';}
+        return $out.self::shell_close();
     }
 
     public static function login( $atts = array() ): string {

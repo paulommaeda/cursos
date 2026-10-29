@@ -3,7 +3,7 @@ Contributors: nexo-cursos
 Tags: courses, lms, woocommerce, education, erp
 Requires at least: 6.4
 Requires PHP: 8.1
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -41,6 +41,8 @@ Desativar e excluir o plugin preserva os registros educacionais por padrão. A c
 As atualizações são distribuídas nas Releases públicas de https://github.com/paulommaeda/cursos. Instale a versão 1.1.0 uma vez para ativar o atualizador nas instalações 1.0.0. Consulte Plugins > Plugins instalados > Verificar atualizações. As atualizações automáticas são opcionais e controladas pelo WordPress.
 
 == Changelog ==
+= 1.3.0 =
+Identidade Shalom em azul, paleta completa, fontes, capas por curso e home personalizável. Datas de início/fim, recorrência diária, semanal, quinzenal, mensal e personalizada, aulas presenciais automáticas, chamada por encontro e gráficos de frequência e cobertura. Histórico preservado em alterações de programação.
 = 1.2.0 =
 Tema Shalom Formação, navegação compartilhada, bloco de cursos, cadastro de alunos, matrícula gratuita e criação automática de produtos para cursos pagos.
 = 1.1.0 =

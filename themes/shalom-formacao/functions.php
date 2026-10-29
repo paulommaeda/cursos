@@ -11,13 +11,7 @@ function shalom_setup(): void {
     add_theme_support('nexo-navigation');
 }
 add_action('after_setup_theme','shalom_setup');
-function shalom_brand(array $settings): array {
-    if($settings['brand_name']==='Nexo Cursos'){$settings['brand_name']='Igreja Shalom';}
-    if($settings['primary_color']==='#167b60'){$settings['primary_color']='#173b34';}
-    if($settings['accent_color']==='#dbef8c'){$settings['accent_color']='#c6a56c';}
-    return $settings;
-}
-add_filter('nexo_settings','shalom_brand');
+require_once get_template_directory().'/design.php';
 function shalom_assets(): void {
     if(defined('NEXO_URL')){wp_enqueue_style('nexo-frontend',NEXO_URL.'assets/frontend.css',[],NEXO_VERSION);}
     wp_enqueue_style('shalom-formacao',get_stylesheet_uri(),function_exists('nexo_settings')?['nexo-frontend']:[],wp_get_theme()->get('Version'));
@@ -53,17 +47,9 @@ function shalom_restore_home(string $name,\WP_Theme $new,\WP_Theme $old): void {
 add_action('switch_theme','shalom_restore_home',10,3);
 function shalom_dependency_notice(): void {
     if(class_exists('NexoCursos\\Commerce')||!current_user_can('activate_plugins')){return;}
-    echo '<div class="notice notice-warning"><p>O tema Shalom Formação usa o Nexo Cursos para catálogo, navegação e matrículas. Instale ou atualize para Nexo Cursos 1.2.0 ou superior e ative o plugin que acompanha o tema.</p><p><a href="'.esc_url(admin_url('plugins.php')).'">Abrir plugins</a></p></div>';
+    echo '<div class="notice notice-warning"><p>O tema Shalom Formação usa o Nexo Cursos para catálogo, navegação e matrículas. Instale ou atualize para Nexo Cursos 1.3.0 ou superior e ative o plugin que acompanha o tema.</p><p><a href="'.esc_url(admin_url('plugins.php')).'">Abrir plugins</a></p></div>';
 }
 add_action('admin_notices','shalom_dependency_notice');
-function shalom_customize(\WP_Customize_Manager $customize): void {
-    $customize->add_section('shalom_home',['title'=>'Página inicial Shalom','priority'=>30]);
-    foreach(['headline'=>['Título principal',"Crescer em Cristo.\nServir com propósito."],'intro'=>['Apresentação','Uma jornada para discipular, aperfeiçoar e enviar. Cursos livres da Igreja Shalom para fortalecer a fé e preparar cada pessoa para servir.']] as $key=>$data){
-        $customize->add_setting('shalom_'.$key,['default'=>$data[1],'sanitize_callback'=>'sanitize_textarea_field']);
-        $customize->add_control('shalom_'.$key,['section'=>'shalom_home','label'=>$data[0],'type'=>'textarea']);
-    }
-}
-add_action('customize_register','shalom_customize');
 add_action('after_setup_theme',static function(){
     if(!class_exists('WooCommerce')){return;}
     remove_action('woocommerce_sidebar','woocommerce_get_sidebar',10);
@@ -75,7 +61,7 @@ add_action('after_setup_theme',static function(){
 
 add_filter('document_title_parts', static function(array $parts): array {
     $brand=function_exists('nexo_settings')?nexo_settings()['brand_name']:'Igreja Shalom';
-    if(is_front_page()){$parts['title']=$brand.' — Discipular, Aperfeiçoar e Enviar';unset($parts['tagline']);}
+    if(is_front_page()){$parts['title']=$brand.' — '.str_replace("\n",' ',(string)shalom_value('headline'));unset($parts['tagline']);}
     else{$parts['site']=$brand;}
     return $parts;
 });

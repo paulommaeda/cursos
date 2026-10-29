@@ -84,7 +84,7 @@ def build_theme(root: Path, output: Path, tag: str | None) -> tuple[str, int]:
         raise ValueError("Invalid theme version")
     if tag and tag != "v" + version:
         raise ValueError("Theme version must match release tag")
-    required = ["style.css", "functions.php", "index.php", "header.php", "footer.php", "front-page.php", "page.php", "single.php", "404.php", "LICENSE.txt", "readme.txt"]
+    required = ["style.css", "functions.php", "design.php", "index.php", "header.php", "footer.php", "front-page.php", "page.php", "single.php", "404.php", "LICENSE.txt", "readme.txt"]
     paths = [theme / name for name in required]
     if (theme / "screenshot.png").is_file():
         paths.append(theme / "screenshot.png")

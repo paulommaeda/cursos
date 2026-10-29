@@ -95,18 +95,19 @@ final class Commerce {
     }
     public static function navigation($atts=[]): string {
         $atts=shortcode_atts(['brand'=>'yes'],$atts,'nexo_navigation');
-        $links=['Início'=>home_url('/'),'Cursos'=>nexo_page_url('catalog'),'Nosso propósito'=>home_url('/#proposito')];
-        if(is_user_logged_in()){$links['Meus cursos']=nexo_page_url('account');}
-        if(current_user_can('manage_options')||current_user_can('nexo_manage_assigned')){$links['Painel do gerente']=nexo_page_url('dashboard');}
+        $items=['home'=>['label'=>'Início','url'=>home_url('/')],'catalog'=>['label'=>'Cursos','url'=>nexo_page_url('catalog')],'purpose'=>['label'=>'Nosso propósito','url'=>home_url('/#proposito')]];
+        if(is_user_logged_in()){$items['account']=['label'=>'Meus cursos','url'=>nexo_page_url('account')];}
+        if(current_user_can('manage_options')||current_user_can('nexo_manage_assigned')){$items['dashboard']=['label'=>'Painel do gerente','url'=>nexo_page_url('dashboard')];}
+        if(function_exists('wc_get_cart_url')){$items['cart']=['label'=>'Carrinho','url'=>wc_get_cart_url()];}
+        if(is_user_logged_in()){
+            if(function_exists('wc_get_page_permalink')){$items['wcaccount']=['label'=>'Minha conta','url'=>wc_get_page_permalink('myaccount')];}
+            $items['logout']=['label'=>'Sair','url'=>wp_logout_url(home_url('/'))];
+        }else{$items['login']=['label'=>'Entrar / cadastrar','url'=>nexo_page_url('login')];}
+        $items=apply_filters('nexo_navigation_items',$items);
         $out='<nav class="nexo-site-navigation" aria-label="Navegação principal">';
         if($atts['brand']==='yes'){$out.='<a class="nexo-navigation-brand" href="'.esc_url(home_url('/')).'">'.esc_html(nexo_settings()['brand_name']).'</a>';}
         $out.='<details class="nexo-navigation-menu" open><summary>Menu <span aria-hidden="true">☰</span></summary><div class="nexo-navigation-links">';
-        foreach($links as $label=>$url){$out.='<a href="'.esc_url($url).'">'.esc_html($label).'</a>';}
-        if(function_exists('wc_get_cart_url')){$out.='<a class="nexo-navigation-cart" href="'.esc_url(wc_get_cart_url()).'">Carrinho</a>';}
-        if(is_user_logged_in()){
-            if(function_exists('wc_get_page_permalink')){$out.='<a href="'.esc_url(wc_get_page_permalink('myaccount')).'">Minha conta</a>';}
-            $out.='<a class="nexo-navigation-account" href="'.esc_url(wp_logout_url(home_url('/'))).'">Sair</a>';
-        }else{$out.='<a class="nexo-navigation-account" href="'.esc_url(nexo_page_url('login')).'">Entrar / cadastrar <span aria-hidden="true">↗</span></a>';}
+        foreach($items as $key=>$item){$class=in_array($key,['login','logout'],true)?'nexo-navigation-account':($key==='cart'?'nexo-navigation-cart':'');$out.='<a class="'.esc_attr($class).'" href="'.esc_url($item['url']).'">'.esc_html($item['label']).'</a>';}
         return $out.'</div></details></nav>';
     }
     private static function intent(): int {
@@ -126,7 +127,7 @@ final class Commerce {
         }
         $errors=['credentials'=>'Confira seu e-mail e senha e tente novamente.','registration'=>'Não foi possível criar a conta. Confira os dados. Se já possui conta com este e-mail, entre na sua conta.','password'=>'Use uma senha de pelo menos 8 caracteres e confirme a mesma senha.','email'=>'Informe seu nome e um endereço de e-mail válido.','limit'=>'Aguarde alguns minutos antes de tentar novamente.','course'=>'Este curso não está disponível para matrícula gratuita.'];
         $code=sanitize_key($_GET['nexo_auth_error']??'');
-        $out='<div class="nexo-app nexo-login-page" style="'.esc_attr(nexo_brand_styles()).'"><section class="nexo-login-story"><a class="nexo-brand" href="'.esc_url(home_url('/')).'">'.esc_html($settings['brand_name']).'</a><div><span class="nexo-eyebrow">UMA JORNADA COM PROPÓSITO</span><h1>Discipular.<br>Aperfeiçoar.<br>Enviar<span>.</span></h1><p>Cresça no conhecimento da Palavra.<br>Prepare-se para servir e abençoar vidas.</p></div><span>Fé que aprende. Amor que serve.</span></section><section class="nexo-login-form-side"><div class="nexo-login-form-wrap"><span class="nexo-eyebrow">'.($register?'COMECE SUA JORNADA':'BEM-VINDO DE VOLTA').'</span><h2>'.esc_html($register?'Crie sua conta':$settings['login_title']).'</h2>';
+        $out='<div class="nexo-app nexo-login-page" style="'.esc_attr(nexo_brand_styles()).'"><section class="nexo-login-story"><a class="nexo-brand" href="'.esc_url(home_url('/')).'">'.esc_html($settings['brand_name']).'</a><div><span class="nexo-eyebrow">'.esc_html($settings['login_eyebrow']).'</span><h1>'.nl2br(esc_html($settings['login_headline'])).'</h1><p>'.nl2br(esc_html($settings['login_story'])).'</p></div><span>'.esc_html($settings['login_footer']).'</span></section><section class="nexo-login-form-side"><div class="nexo-login-form-wrap"><span class="nexo-eyebrow">'.($register?'COMECE SUA JORNADA':'BEM-VINDO DE VOLTA').'</span><h2>'.esc_html($register?'Crie sua conta':$settings['login_title']).'</h2>';
         if($valid){$out.='<p class="nexo-free-intent"><strong>Curso gratuito</strong><br>'.esc_html(get_the_title($id)).'<br><small>Sua matrícula será confirmada ao '.($register?'criar a conta':'entrar').'.</small></p>';}
         elseif($id){$out.='<p role="alert" class="nexo-notice">Este curso não está disponível para inscrição gratuita. Você pode acessar sua conta normalmente.</p>';}
         else{$out.='<p class="nexo-muted">'.esc_html($settings['login_message']).'</p>';}

@@ -1,6 +1,6 @@
 # Shalom Formação — instalação e uso
 
-A versão 1.2.0 reúne o plugin Nexo Cursos e o tema Shalom Formação. A home apresenta os cursos livres da Igreja Shalom e o propósito de **discipular, aperfeiçoar e enviar**, inspirado em Efésios 4:12.
+A versão 1.3.0 reúne o plugin Nexo Cursos e o tema Shalom Formação. A home apresenta os cursos livres da Igreja Shalom e o propósito de **discipular, aperfeiçoar e enviar**, inspirado em Efésios 4:12.
 
 ## Instalar os dois pacotes
 
@@ -43,13 +43,13 @@ Nos testes, adicione perguntas, pelo menos duas alternativas por pergunta, uma r
 
 O formato **Gestão / presencial** mantém matrículas, início, local, carga horária e presenças. A área de aprendizagem fica desativada, mesmo que o curso tenha aulas cadastradas. Um curso pode ter matrícula gratuita ou paga independentemente de ser EAD ou presencial.
 
-Crie usuários com papel **Gerente de cursos** e atribua-os nos cursos. Gerentes acompanham apenas os cursos atribuídos, com matrículas, progresso e presença por data. A edição de cursos, conteúdos e identidade visual permanece com o administrador.
+Crie usuários com papel **Gerente de cursos** e atribua-os nos cursos. Gerentes acompanham apenas os cursos atribuídos, com matrículas, progresso e chamada por aula nos cursos presenciais. A edição de cursos, conteúdos e identidade visual permanece com o administrador.
 
 ## Personalizar
 
-- **Aparência → Personalizar:** logo, título principal e texto de apresentação da home.
+- **Aparência → Personalizar:** logo, textos, imagens, botões, destinos, navegação, rodapé, paleta, fontes e organização das seções da home.
 - **Nexo Cursos → Identidade visual:** nome, logo, cores e textos de login. O tema compartilha essa identidade e fornece a marca Shalom como padrão, preservando configurações personalizadas.
-- O bloco da home mostra até três cursos publicados mais recentes. O catálogo completo permanece na página Cursos. Sem cursos publicados, aparece uma mensagem de preparação, sem dados fictícios.
+- O bloco da home mostra os cursos publicados mais recentes; o padrão de três cursos pode ser alterado para até doze no Personalizador. O catálogo completo permanece na página Cursos. Sem cursos publicados, aparece uma mensagem de preparação, sem dados fictícios.
 
 ## Páginas e atalhos
 
@@ -66,3 +66,26 @@ A entrega inclui gestão educacional, cursos livres, matrículas, testes, presen
 Desativar ou excluir o plugin preserva os dados educacionais por padrão. A limpeza definitiva é uma opção explícita documentada no readme. Páginas e registros financeiros do WooCommerce são mantidos.
 
 Antes de abrir inscrições, teste cadastro/login, matrícula gratuita, compra em modo de testes, acesso, permissões e reembolso na combinação de tema, gateway e extensões do seu site. Nenhuma instalação de produção foi alterada nesta entrega.
+
+
+## Aulas presenciais e chamadas (1.3.0)
+
+No cadastro do curso, selecione **Gestão / presencial**. Em **Programação presencial e recorrência**, defina início, fim (inclusive), horário, duração e frequência. Marque **Gerar e atualizar aulas ao salvar**. As opções são encontro único, diário, dias úteis, semanal, quinzenal, mensal e intervalo personalizado em dias, semanas ou meses. Sem seleção de dia da semana, usa o dia da data inicial. A frequência mensal ajusta datas como 31 de janeiro para o último dia de fevereiro e volta ao dia 31 em março. Limite de 500 encontros por programação, com erro explícito antes de gravar se excedido.
+
+Exemplo: 16/02/2027 a 20/04/2027, semanal, terça-feira, 20h gera dez aulas. Este exemplo não é importado automaticamente.
+
+Em **Nexo Cursos → Visão geral**, selecione o curso presencial. O calendário permite abrir cada chamada, adicionar aulas extras, cancelar encontros sem chamada e marcar uma aula como realizada. A chamada libera na data do encontro e usa quatro situações: presente, ausente, justificada e pendente. Salve a chamada após preencher. O aluno vê seu próprio calendário e suas presenças na área do curso.
+
+O gráfico mostra até os 12 últimos encontros considerados, com tabela acessível e fórmula. Frequência = presentes ÷ (presentes + ausentes). Justificadas e pendentes não entram nessa divisão. Cobertura = chamadas preenchidas (presente, ausente ou justificada) ÷ registros esperados de alunos elegíveis. Campos em branco não viram faltas. Uma aula realizada sem chamada aparece com pendências e frequência indefinida. Aulas futuras, canceladas e alunos matriculados depois do encontro ficam fora da base correspondente.
+
+Ao alterar início, fim ou frequência, salvar novamente concilia a programação sem duplicar as datas. Preserva aulas passadas, realizadas ou com chamada. Encontros futuros retirados são cancelados e podem voltar se a data retornar à programação; cancelamentos manuais continuam cancelados. Aulas extras não são alteradas. Para uma reposição, cancele o encontro sem registros e adicione a aula extra. O histórico não é apagado por uma mudança de datas.
+
+Chamadas antigas por data continuam preservadas. Em **Programação e aulas extras → Importar chamadas antigas por data**, registros só são copiados quando existe uma única aula naquela data e ainda não existe chamada por encontro para o aluno. Não sobrescreve registros. Se houver mais de um encontro no mesmo dia, faça a conferência manual. As presenças também participam das ferramentas de exportação e exclusão de dados pessoais do WordPress.
+
+## Personalização completa da apresentação (1.3.0)
+
+**Nexo Cursos → Identidade visual:** nome, logo, 12 cores, fontes de títulos e textos, cantos dos cartões e apresentação do login. As três famílias disponíveis usam fontes locais, sem serviços externos.
+
+**Aparência → Personalizar:** logo, nome, todos os textos da home, imagens, rótulos do menu, botões e seus destinos, rodapé, quantidade de cursos, ordem e visibilidade das seções. Em ordem das seções use `hero,strip,purpose,courses,scripture,journey`, reordene ou remova os nomes. A imagem principal opcional substitui a ilustração de montanhas e caminho. Para ajustes adicionais, o CSS adicional nativo do WordPress continua disponível.
+
+**Cada curso:** a imagem destacada é a capa; a cor e a frase da capa são opcionais e herdam a marca quando vazias. A identidade usa azul profundo, ciano, branco e luz dourada como ponto de partida. Pode ser substituída para outra organização. A migração aplica novos padrões uma única vez e preserva valores que já foram personalizados.

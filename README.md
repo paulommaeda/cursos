@@ -1,4 +1,4 @@
-# Nexo Cursos
+# Nexo Cursos e Shalom Formação — 1.3.0
 
 Plugin WordPress e tema Shalom Formação para cursos livres da Igreja Shalom: discipular, aperfeiçoar e enviar, conforme Efésios 4:12. O plugin administra cursos EAD, presenciais ou apenas seus cadastros e matrículas. As vendas usam o WooCommerce. Tópicos, aulas e testes são opcionais em cada curso.
 
@@ -17,6 +17,18 @@ Requisitos: WordPress 6.4+, PHP 8.1+ e WooCommerce 8.2+ para vendas. A gestão c
 Use o anexo `nexo-cursos.zip` da release. Os arquivos automáticos “Source code” do GitHub contêm o repositório e não são o pacote de distribuição preparado pelo projeto.
 
 O [guia de instalação e uso](GUIA.md) explica cursos, componentes, gerentes, páginas, identidade visual e matrículas. Faça a primeira instalação e uma compra de teste em uma cópia do seu site.
+
+## Aulas presenciais e engajamento
+
+No curso, defina data inicial, data final, horário, duração e frequência. Há encontros únicos, diário, dias úteis, semanal, quinzenal, mensal e intervalos personalizados. No formato gestão/presencial, habilite a geração das aulas ao salvar. Os gerentes abrem cada aula, registram presente, ausente, justificada ou pendente e acompanham a frequência da turma e de cada aluno. O gráfico considera encontros realizados; aulas futuras e canceladas ficam fora.
+
+Frequência registrada = presentes / (presentes + ausentes). Justificadas e pendentes ficam fora da porcentagem. A cobertura mostra quanto da chamada já foi preenchido. Não há falta automática por registro em branco. Matrículas posteriores ao encontro ficam fora da base daquela aula. Mudanças da programação mantêm aulas passadas, realizadas e com chamada; aulas futuras retiradas são canceladas sem apagar o histórico.
+
+## Identidade visual editável
+
+Em **Nexo Cursos → Identidade visual**, altere nome, logo, paleta, fontes, arredondamento e os textos do acesso. Em **Aparência → Personalizar → Identidade e home Shalom**, edite a apresentação inteira: textos, botões, destinos, imagem principal, rodapé, rótulos de navegação, visibilidade e ordem das seções. A paleta é compartilhada com o plugin. Cada curso aceita cor, frase da capa e imagem destacada próprias. A arte padrão é uma ilustração original de caminho e luz, com azul profundo, ciano, branco e dourado.
+
+A atualização troca os antigos valores padrão da Shalom apenas uma vez; valores personalizados são preservados e escolhas feitas depois não são sobrescritas. Não instala imagens de referência, alunos ou cursos de demonstração no site.
 
 ## Gratuitos e pagos
 
@@ -59,7 +71,7 @@ O pacote é criado por `tools/build-release.py` com uma lista permitida de arqui
 Para montar o mesmo pacote localmente, execute a partir da raiz do repositório:
 
 ```sh
-python3 tools/build-release.py --tag v1.2.0
+python3 tools/build-release.py --tag v1.3.0
 ```
 
 São criados `dist/nexo-cursos.zip` e `dist/shalom-formacao.zip`. O tema fica em `themes/shalom-formacao` no repositório e tem a mesma versão da Release. O atualizador do plugin reconhece o pacote do tema separadamente.

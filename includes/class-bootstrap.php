@@ -14,6 +14,8 @@ final class Bootstrap {
     }
     public static function activate(): void {
         Core::activate();
+        Calendar::install();
+        Calendar::register_type();
         add_option( 'nexo_settings', nexo_settings() );
         self::setup_pages();
         update_option( 'nexo_version', NEXO_VERSION );
